@@ -60,9 +60,9 @@ export const Footer: React.FC<FooterProps> = ({ language = "en" }) => {
         </div>
 
         <div className="border-t border-slate-200 dark:border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 dark:text-slate-400">
-          <p>© 2026 ಕೃಷಿ ಸಂಜೀವಿನಿ • {language === "kn" ? "ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಸ್ಪರ್ಧೆಯ ಸಲ್ಲಿಕೆ" : "Smart & Sustainable Agriculture Challenge Submission"}</p>
+          <p>© 2026 ಕೃಷಿ ಸಂಜೀವಿನಿ • Built By Rynal D Souza. All rights reserved.</p>
           <div className="flex items-center gap-2">
-            <span>Built with Next.js 14, Tailwind CSS, TypeScript & AI/ML</span>
+            <span>Built with Next.js 14, Tailwind CSS, TypeScript & AI/ML • Built By Rynal D Souza. All rights reserved.</span>
           </div>
         </div>
 
