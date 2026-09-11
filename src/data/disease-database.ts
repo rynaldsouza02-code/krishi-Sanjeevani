@@ -334,10 +334,4 @@ export const DISEASE_DATABASE: PlantDisease[] = [
     favorableConditions: "Warm humid weather with alternating rain and dry periods (24°C - 29°C).",
     favorableConditionsKannada: "ಬೆಚ್ಚಗಿನ ತೇವಾಂಶದ ವಾತಾವರಣ ಮತ್ತು 24-29°C ಉಷ್ಣಾಂಶ."
   }
-];ff ground",
-      "Practice 3-year crop rotation (avoid Solanaceous crops)",
-      "Drip irrigate at plant base rather than overhead spraying"
-    ],
-    favorableConditions: "Warm humid weather with alternating rain and dry dry periods (24°C - 29°C)."
-  }
 ];
