@@ -250,6 +250,11 @@ export function predictYield(input: YieldPredictionInput): YieldPredictionOutput
 
 export interface DiseaseDiagnosisOutput {
   disease: PlantDisease;
+  detectedPlantName: string;
+  detectedPlantKannada: string;
+  detectedDiseaseName: string;
+  detectedDiseaseKannada: string;
+  scientificName: string;
   simulatedConfidence: number;
   allPossibilities: Array<{ disease: PlantDisease; probability: number }>;
   visionFeatures: {
@@ -263,7 +268,7 @@ export interface DiseaseDiagnosisOutput {
 /**
  * Plant Disease Inference Engine with Multi-Candidate Possibilities & Vision Metrics
  */
-export function diagnoseLeafDisease(sampleId?: string): DiseaseDiagnosisOutput {
+export function diagnoseLeafDisease(sampleId?: string, imageMetrics?: { chlorosis?: number; lesion?: number }): DiseaseDiagnosisOutput {
   let mainDisease = DISEASE_DATABASE[0];
 
   if (sampleId) {
@@ -297,13 +302,21 @@ export function diagnoseLeafDisease(sampleId?: string): DiseaseDiagnosisOutput {
 
   possibilities.sort((a, b) => b.probability - a.probability);
 
+  const chlorosis = imageMetrics?.chlorosis ?? Math.round(68 + Math.random() * 20);
+  const lesion = imageMetrics?.lesion ?? Math.round(35 + Math.random() * 30);
+
   return {
     disease: mainDisease,
+    detectedPlantName: mainDisease.cropName,
+    detectedPlantKannada: mainDisease.cropKannadaName || mainDisease.cropName,
+    detectedDiseaseName: mainDisease.diseaseName,
+    detectedDiseaseKannada: mainDisease.kannadaName,
+    scientificName: mainDisease.scientificName,
     simulatedConfidence: primaryProb,
     allPossibilities: possibilities,
     visionFeatures: {
-      chlorosisScore: Math.round(68 + Math.random() * 20),
-      necroticLesionRatio: Math.round(35 + Math.random() * 30),
+      chlorosisScore: chlorosis,
+      necroticLesionRatio: lesion,
       patternType: mainDisease.severity === "Critical" ? "Fungal Spore Mycelium & Lesion Decay" : "Foliar Chlorotic Bands & Spot Lesions",
       patternTypeKannada: mainDisease.severity === "Critical" ? "ಶಿಲೀಂಧ್ರದ ಹರಡುವಿಕೆ ಮತ್ತು ಕೊಳೆತ ಮಚ್ಚೆಗಳು" : "ಎಲೆಯ ಬಣ್ಣ ಬದಲಾವಣೆ ಮತ್ತು ಮಚ್ಚೆಯ ಸಂರಚನೆ"
     }

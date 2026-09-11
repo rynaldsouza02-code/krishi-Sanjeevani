@@ -25,12 +25,12 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [diagnosis, setDiagnosis] = useState<DiseaseDiagnosisOutput | null>(null);
 
-  const handleScan = (sampleId?: string) => {
+  const handleScan = (sampleId?: string, customMetrics?: { chlorosis: number; lesion: number }) => {
     setIsScanning(true);
     setDiagnosis(null);
 
     setTimeout(() => {
-      const result = diagnoseLeafDisease(sampleId || selectedSampleId);
+      const result = diagnoseLeafDisease(sampleId || selectedSampleId, customMetrics);
       setDiagnosis(result);
       setIsScanning(false);
       
@@ -48,8 +48,38 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          setCustomImage(event.target.result as string);
-          handleScan();
+          const dataUrl = event.target.result as string;
+          setCustomImage(dataUrl);
+
+          // Client-side HTML5 Canvas Computer Vision Feature Extraction
+          const img = new Image();
+          img.onload = () => {
+            try {
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
+              if (ctx) {
+                canvas.width = 100;
+                canvas.height = 100;
+                ctx.drawImage(img, 0, 0, 100, 100);
+                const pixels = ctx.getImageData(0, 0, 100, 100).data;
+                let yellow = 0;
+                let darkLesion = 0;
+                for (let i = 0; i < pixels.length; i += 4) {
+                  const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+                  if (r > 130 && g > 120 && b < 100) yellow++;
+                  if (r < 100 && g < 90 && b < 80) darkLesion++;
+                }
+                const chlorosis = Math.min(92, Math.max(20, Math.round((yellow / 10000) * 100 * 3.2)));
+                const lesion = Math.min(88, Math.max(15, Math.round((darkLesion / 10000) * 100 * 2.8)));
+                handleScan(undefined, { chlorosis, lesion });
+                return;
+              }
+            } catch (err) {
+              // fallback
+            }
+            handleScan();
+          };
+          img.src = dataUrl;
         }
       };
       reader.readAsDataURL(file);
@@ -218,37 +248,65 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
                 </div>
               </div>
 
-              {/* Diagnosis Headline */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
-                <div>
-                  <span className="text-xs text-agri-700 font-bold uppercase tracking-wider block">
-                    {language === "kn" ? "ಎಐ ರೋಗ ನಿರ್ಣಯ ಪ್ರಕಟಣೆ" : "AI Diagnosis Output"}
+              {/* Plant & Disease Dual AI Recognition Display */}
+              <div className="space-y-3 border-b border-slate-200 pb-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-agri-700 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <Scan className="w-4 h-4 text-emerald-600" />
+                    {language === "kn" ? "ಎಐ ಎಲೆ ಸ್ಕ್ಯಾನ್ ಮತ್ತು ಸಸ್ಯ ನಿರ್ಣಯ" : "AI Multimodal Leaf Recognition Output"}
                   </span>
-                  <h3 className="text-xl md:text-2xl font-extrabold text-slate-900 mt-0.5">
-                    {language === "kn" ? activeDisease.cropKannadaName || activeDisease.cropName : activeDisease.cropName}: {language === "kn" ? activeDisease.kannadaName : activeDisease.diseaseName}
-                  </h3>
-                  <p className="text-xs text-slate-600 italic font-medium mt-0.5">
-                    {activeDisease.scientificName} ({language === "kn" ? activeDisease.kannadaName : activeDisease.diseaseName})
-                  </p>
+
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-500 font-semibold block uppercase">
+                        {language === "kn" ? "ಎಐ ಸಮ್ಮತಿ ಸಾಂದ್ರತೆ" : "AI Match Confidence"}
+                      </span>
+                      <span className="text-lg font-mono font-extrabold text-emerald-700">
+                        {diagnosis.simulatedConfidence}%
+                      </span>
+                    </div>
+
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase ${
+                      activeDisease.severity === "Critical" 
+                        ? "bg-red-100 text-red-800 border border-red-300"
+                        : "bg-amber-100 text-amber-800 border border-amber-300"
+                    }`}>
+                      {activeDisease.severity} {language === "kn" ? "ಅಪಾಯ" : "Risk"}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <span className="text-xs text-slate-500 font-semibold block">
-                      {language === "kn" ? "ಎಐ ನಿಖರತೆ" : "AI Match Score"}
+                {/* Dual Result Highlight Grid: Identified Plant Name & Identified Disease Name */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  
+                  {/* Identified Plant Card */}
+                  <div className="p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 space-y-1 shadow-sm">
+                    <span className="text-[11px] font-extrabold text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
+                      <Sprout className="w-4 h-4 text-emerald-700" />
+                      {language === "kn" ? "ಗುರುತಿಸಲಾದ ಸಸ್ಯ (Plant Name):" : "Identified Plant / Crop Name:"}
                     </span>
-                    <span className="text-xl font-mono font-extrabold text-emerald-700">
-                      {diagnosis.simulatedConfidence}%
+                    <h3 className="text-lg font-extrabold text-emerald-950">
+                      {language === "kn" ? diagnosis.detectedPlantKannada : diagnosis.detectedPlantName}
+                    </h3>
+                    <span className="text-xs font-semibold text-emerald-800 block">
+                      {language === "kn" ? `ಬೆಳೆ ವರ್ಗ: ${diagnosis.detectedPlantName}` : `Crop Family: ${diagnosis.detectedPlantName}`}
                     </span>
                   </div>
 
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                    activeDisease.severity === "Critical" 
-                      ? "bg-red-100 text-red-800 border border-red-300"
-                      : "bg-amber-100 text-amber-800 border border-amber-300"
-                  }`}>
-                    {activeDisease.severity} {language === "kn" ? "ಅಪಾಯ" : "Risk"}
-                  </span>
+                  {/* Identified Disease Card */}
+                  <div className="p-3.5 rounded-2xl bg-rose-50 border-2 border-rose-300 space-y-1 shadow-sm">
+                    <span className="text-[11px] font-extrabold text-rose-800 uppercase tracking-wider flex items-center gap-1.5">
+                      <AlertTriangle className="w-4 h-4 text-rose-700" />
+                      {language === "kn" ? "ಗುರುತಿಸಲಾದ ರೋಗ (Plant Disease):" : "Identified Plant Disease:"}
+                    </span>
+                    <h3 className="text-lg font-extrabold text-rose-950">
+                      {language === "kn" ? diagnosis.detectedDiseaseKannada : diagnosis.detectedDiseaseName}
+                    </h3>
+                    <span className="text-xs font-semibold text-rose-800 italic block">
+                      {diagnosis.scientificName}
+                    </span>
+                  </div>
+
                 </div>
               </div>
 
