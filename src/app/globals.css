@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-main: #f8fafc;
+    --text-main: #0f172a;
+  }
+
+  .dark {
+    --bg-main: #020617;
+    --text-main: #f8fafc;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    @apply antialiased selection:bg-agri-500 selection:text-white transition-colors duration-300;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-agri-700 via-agri-600 to-emerald-700 dark:from-agri-400 dark:via-emerald-400 dark:to-teal-300;
+}
+
+/* Scanner Beam Animation for Leaf Disease Detection */
+@keyframes laser {
+  0% { top: 0%; opacity: 0.8; }
+  50% { top: 95%; opacity: 1; }
+  100% { top: 0%; opacity: 0.8; }
+}
+
+.scanner-laser {
+  animation: laser 2.5s ease-in-out infinite;
+  box-shadow: 0 0 15px #16a34a, 0 0 30px #22c55e;
+}
+
+/* Hide Scrollbar completely on navigation elements */
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
