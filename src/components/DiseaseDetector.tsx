@@ -95,7 +95,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
             <Scan className="w-6 h-6 text-agri-600" />
             <span>
               {language === "kn"
@@ -103,7 +103,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
                 : "AI Multimodal Leaf Disease Detector"}
             </span>
           </h2>
-          <p className="text-xs md:text-sm text-slate-600 font-medium mt-1">
+          <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 font-medium mt-1">
             {language === "kn"
               ? "ಸರ್ಕಾರಿ ಭಾರತೀಯ ಕೃಷಿ ಸಂಶೋಧನಾ ಮಂಡಳಿ (ICAR) ಮತ್ತು ಕೃಷಿ ವಿಶ್ವವಿದ್ಯಾನಿಲಯಗಳ ಅಧಿಕೃತ ಮಾಹಿತಿಯ ಆಧಾರಿತ ರೋಗ ಪತ್ತೆ."
               : "Computer Vision leaf pathogen diagnosis verified via ICAR & UAS Karnataka Government research bulletins."}
@@ -111,8 +111,8 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-700" />
+          <span className="text-xs px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-bold flex items-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
             <span>{language === "kn" ? "ಸರ್ಕಾರಿ ಮಾಹಿತಿ ಪರಿಶೀಲಿತ" : "ICAR Govt Verified"}</span>
           </span>
         </div>
@@ -123,13 +123,13 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
         {/* Left Column: Image Uploader & Live Scanner Viewport */}
         <div className="lg:col-span-5 space-y-4">
           
-          <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-md space-y-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
             
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold text-slate-900">
+              <span className="text-xs font-extrabold text-slate-900 dark:text-white">
                 {language === "kn" ? "ಎಲೆ ಮಾದರಿ ಶೋಧಕ" : "Leaf Sample Scanner"}
               </span>
-              <span className="text-[11px] text-slate-500 font-medium">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                 {language === "kn" ? "ಮಾದರಿ ಆಯ್ಕೆ ಮಾಡಿ ಅಥವಾ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ" : "Select sample or upload photo"}
               </span>
             </div>
@@ -170,7 +170,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
 
             {/* Sample Selector Buttons */}
             <div className="space-y-2">
-              <span className="text-[11px] font-bold text-slate-600 block">
+              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 block">
                 {language === "kn" ? "ಕರ್ನಾಟಕದ ಬೆಳೆ ಮಾದರಿಗಳನ್ನು ಪರೀಕ್ಷಿಸಿ:" : "Try Karnataka Crop Samples:"}
               </span>
               <div className="grid grid-cols-3 gap-2">
@@ -184,12 +184,12 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
                     }}
                     className={`p-2 rounded-xl text-left border transition-all text-xs cursor-pointer ${
                       selectedSampleId === d.id && !customImage
-                        ? "bg-emerald-100 border-emerald-400 text-emerald-900 font-extrabold shadow-sm"
-                        : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                        ? "bg-emerald-100 dark:bg-emerald-950 border-emerald-400 dark:border-emerald-600 text-emerald-900 dark:text-emerald-100 font-extrabold shadow-sm"
+                        : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
                     }`}
                   >
                     <span className="block truncate font-bold">{language === "kn" ? (d.cropKannadaName || d.cropName) : d.cropName}</span>
-                    <span className="text-[10px] text-slate-500 block truncate">{language === "kn" ? d.kannadaName : d.diseaseName.split("(")[0]}</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">{language === "kn" ? d.kannadaName : d.diseaseName.split("(")[0]}</span>
                   </button>
                 ))}
               </div>
@@ -206,9 +206,9 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
               />
               <label
                 htmlFor="leaf-upload-input"
-                className="w-full py-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-900 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                className="w-full py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors"
               >
-                <Upload className="w-4 h-4 text-agri-600" />
+                <Upload className="w-4 h-4 text-agri-600 dark:text-agri-400" />
                 <span>{language === "kn" ? "ಎಲೆಯ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ" : "Upload Custom Leaf Photo"}</span>
               </label>
             </div>
@@ -311,33 +311,33 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
               </div>
 
               {/* Computer Vision Extraction Feature Metrics */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <span className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
-                  <Scan className="w-4 h-4 text-emerald-600" />
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+                <span className="text-xs font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <Scan className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   {language === "kn" ? "ಎಲೆ ವಿಷುಯಲ್ ಲಕ್ಷಣಗಳ ವಿಶ್ಲೇಷಣೆ:" : "Computer Vision Feature Extraction:"}
                 </span>
                 <div className="grid grid-cols-3 gap-3 text-xs">
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-500 block text-[11px]">
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">
                       {language === "kn" ? "ಹಳದಿ ಬಣ್ಣದ ಶೇಕಡಾ (Chlorosis)" : "Foliar Chlorosis"}
                     </span>
-                    <span className="font-mono font-extrabold text-slate-900 text-sm">
+                    <span className="font-mono font-extrabold text-slate-900 dark:text-white text-sm">
                       {diagnosis.visionFeatures.chlorosisScore}%
                     </span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-500 block text-[11px]">
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">
                       {language === "kn" ? "ಕೊಳೆತ ಮಚ್ಚೆಯ ಸಾಂದ್ರತೆ" : "Lesion Coverage"}
                     </span>
-                    <span className="font-mono font-extrabold text-slate-900 text-sm">
+                    <span className="font-mono font-extrabold text-slate-900 dark:text-white text-sm">
                       {diagnosis.visionFeatures.necroticLesionRatio}%
                     </span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-500 block text-[11px]">
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">
                       {language === "kn" ? "ಮಚ್ಚೆಯ ಸಂರಚನೆ" : "Pathogen Pattern"}
                     </span>
-                    <span className="font-bold text-slate-900 text-xs block truncate" title={language === "kn" ? diagnosis.visionFeatures.patternTypeKannada : diagnosis.visionFeatures.patternType}>
+                    <span className="font-bold text-slate-900 dark:text-slate-100 text-xs block truncate" title={language === "kn" ? diagnosis.visionFeatures.patternTypeKannada : diagnosis.visionFeatures.patternType}>
                       {language === "kn" ? diagnosis.visionFeatures.patternTypeKannada : diagnosis.visionFeatures.patternType}
                     </span>
                   </div>
@@ -345,13 +345,13 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
               </div>
 
               {/* Multi-Candidate Possibilities Breakdown */}
-              <div className="space-y-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
-                    <BarChart2 className="w-4 h-4 text-indigo-600" />
+                  <span className="text-xs font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <BarChart2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                     {language === "kn" ? "ಸಾಧ್ಯತೆಗಳ ಎಲ್ಲಾ ವರ್ಗೀಕರಣ (Multi-Class Probability):" : "All Ranked Disease Possibilities:"}
                   </span>
-                  <span className="text-[11px] text-slate-500 font-medium">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     {language === "kn" ? "ಸುಳ್ಳು ಮಾಹಿತಿಯಿಲ್ಲದ ಪಾರದರ್ಶಕ ನಿರ್ಧಾರ" : "Verified Multi-Candidate Spectrum"}
                   </span>
                 </div>
@@ -360,15 +360,15 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
                   {diagnosis.allPossibilities.map((item, idx) => (
                     <div key={idx} className="space-y-1">
                       <div className="flex items-center justify-between text-xs font-semibold">
-                        <span className="text-slate-800">
+                        <span className="text-slate-800 dark:text-slate-200">
                           {idx + 1}. {language === "kn" ? (item.disease.cropKannadaName || item.disease.cropName) : item.disease.cropName} - {language === "kn" ? item.disease.kannadaName : item.disease.diseaseName}
                         </span>
-                        <span className="font-mono font-extrabold text-slate-900">{item.probability}%</span>
+                        <span className="font-mono font-extrabold text-slate-900 dark:text-white">{item.probability}%</span>
                       </div>
-                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div 
                           className={`h-full rounded-full transition-all duration-500 ${
-                            idx === 0 ? "bg-emerald-600" : idx === 1 ? "bg-amber-500" : "bg-slate-400"
+                            idx === 0 ? "bg-emerald-600" : idx === 1 ? "bg-amber-500" : "bg-slate-400 dark:bg-slate-600"
                           }`}
                           style={{ width: `${item.probability}%` }}
                         ></div>
@@ -380,13 +380,13 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
 
               {/* Symptoms Bullet List */}
               <div className="space-y-2">
-                <span className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4 text-amber-600" />
+                <span className="text-xs font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                   {language === "kn" ? "ರೋಗದ ಲಕ್ಷಣಗಳು:" : "Visual Symptoms:"}
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {(language === "kn" ? (activeDisease.symptomsKannada || activeDisease.symptoms) : activeDisease.symptoms).map((sym, i) => (
-                    <div key={i} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 font-medium">
+                    <div key={i} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-200 font-medium">
                       • {sym}
                     </div>
                   ))}
@@ -397,15 +397,15 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 
                 {/* Organic Remedies */}
-                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
-                  <span className="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
-                    <Sprout className="w-4 h-4 text-emerald-700" />
+                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 space-y-2">
+                  <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                    <Sprout className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
                     {language === "kn" ? "ಸಾವಯವ ಉಪಚಾರಗಳು:" : "Organic & Bio-Controls:"}
                   </span>
-                  <ul className="space-y-1.5 text-xs text-slate-800 font-medium">
+                  <ul className="space-y-1.5 text-xs text-slate-800 dark:text-slate-200 font-medium">
                     {(language === "kn" ? (activeDisease.organicTreatmentKannada || activeDisease.organicTreatment) : activeDisease.organicTreatment).map((org, i) => (
                       <li key={i} className="flex items-start gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
                         <span>{org}</span>
                       </li>
                     ))}
@@ -413,12 +413,12 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
                 </div>
 
                 {/* Chemical Controls */}
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                  <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                    <Droplets className="w-4 h-4 text-blue-600" />
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                  <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <Droplets className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     {language === "kn" ? "ರಾಸಾಯನಿಕ ಸಿಂಪಡಣೆ (CIBRC ನಮೂದಿತ):" : "Chemical Controls (CIBRC Approved):"}
                   </span>
-                  <ul className="space-y-1.5 text-xs text-slate-800 font-medium">
+                  <ul className="space-y-1.5 text-xs text-slate-800 dark:text-slate-200 font-medium">
                     {(language === "kn" ? (activeDisease.chemicalTreatmentKannada || activeDisease.chemicalTreatment) : activeDisease.chemicalTreatment).map((chem, i) => (
                       <li key={i} className="flex items-start gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5"></span>
@@ -431,26 +431,26 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
               </div>
 
               {/* Favorable Conditions & Prevention */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2">
-                <span className="font-bold text-slate-900 block">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs space-y-2">
+                <span className="font-bold text-slate-900 dark:text-white block">
                   {language === "kn" ? "ಹವಾಮಾನ ಮತ್ತು ರೋಗ ಹರಡುವಿಕೆ ವಾತಾವರಣ:" : "Weather & Outbreak Risk Factor:"}
                 </span>
-                <p className="text-slate-600 font-medium">
+                <p className="text-slate-600 dark:text-slate-300 font-medium">
                   {language === "kn" ? (activeDisease.favorableConditionsKannada || activeDisease.favorableConditions) : activeDisease.favorableConditions}
                 </p>
               </div>
 
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-12 border border-slate-200 shadow-md text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-700 flex items-center justify-center mx-auto">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 border border-slate-200 dark:border-slate-800 shadow-md text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mx-auto">
                 <Scan className="w-8 h-8" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-slate-900">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                   {language === "kn" ? "ಎಲೆಯ ಫೋಟೋ ಪರಿಶೀಲನೆಗೆ ಸಿದ್ಧವಾಗಿದೆ" : "Ready to Scan Leaf Photo"}
                 </h3>
-                <p className="text-xs text-slate-600 font-medium max-w-sm mx-auto mt-1">
+                <p className="text-xs text-slate-600 dark:text-slate-400 font-medium max-w-sm mx-auto mt-1">
                   {language === "kn"
                     ? "ಎಡಭಾಗದಲ್ಲಿರುವ ಮಾದರಿಯನ್ನು ಆರಿಸಿ ಅಥವಾ ನಿಮ್ಮ ಹೊಲದ ಎಲೆಯ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ ರೋಗ ಪತ್ತೆ ಮಾಡಿ."
                     : "Select a Karnataka crop leaf sample on the left or upload your own leaf picture to run instant AI disease diagnosis."}
