@@ -84,8 +84,6 @@ export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
       
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
             <Bot className="w-6 h-6 text-agri-600" />
