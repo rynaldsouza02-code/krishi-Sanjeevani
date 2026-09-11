@@ -248,19 +248,64 @@ export function predictYield(input: YieldPredictionInput): YieldPredictionOutput
   };
 }
 
+export interface DiseaseDiagnosisOutput {
+  disease: PlantDisease;
+  simulatedConfidence: number;
+  allPossibilities: Array<{ disease: PlantDisease; probability: number }>;
+  visionFeatures: {
+    chlorosisScore: number;
+    necroticLesionRatio: number;
+    patternType: string;
+    patternTypeKannada: string;
+  };
+}
+
 /**
- * Plant Disease Inference Engine
+ * Plant Disease Inference Engine with Multi-Candidate Possibilities & Vision Metrics
  */
-export function diagnoseLeafDisease(sampleId?: string): { disease: PlantDisease; simulatedConfidence: number } {
+export function diagnoseLeafDisease(sampleId?: string): DiseaseDiagnosisOutput {
+  let mainDisease = DISEASE_DATABASE[0];
+
   if (sampleId) {
     const found = DISEASE_DATABASE.find(d => d.id === sampleId);
     if (found) {
-      return { disease: found, simulatedConfidence: found.confidence };
+      mainDisease = found;
     }
+  } else {
+    const randomIndex = Math.floor(Math.random() * DISEASE_DATABASE.length);
+    mainDisease = DISEASE_DATABASE[randomIndex];
   }
 
-  // Random sample fallback for generic upload demonstration
-  const randomIndex = Math.floor(Math.random() * DISEASE_DATABASE.length);
-  const disease = DISEASE_DATABASE[randomIndex];
-  return { disease, simulatedConfidence: Math.round(880 + Math.random() * 100) / 10 };
+  const primaryProb = mainDisease.confidence;
+  let remaining = Math.round((100 - primaryProb) * 10) / 10;
+
+  const possibilities: Array<{ disease: PlantDisease; probability: number }> = [
+    { disease: mainDisease, probability: primaryProb }
+  ];
+
+  const others = DISEASE_DATABASE.filter(d => d.id !== mainDisease.id);
+  others.forEach((d, idx) => {
+    let p = 0;
+    if (idx === others.length - 1) {
+      p = Math.max(0.2, Math.round(remaining * 10) / 10);
+    } else {
+      p = Math.max(0.2, Math.round((remaining * 0.45) * 10) / 10);
+      remaining = Math.round((remaining - p) * 10) / 10;
+    }
+    possibilities.push({ disease: d, probability: p });
+  });
+
+  possibilities.sort((a, b) => b.probability - a.probability);
+
+  return {
+    disease: mainDisease,
+    simulatedConfidence: primaryProb,
+    allPossibilities: possibilities,
+    visionFeatures: {
+      chlorosisScore: Math.round(68 + Math.random() * 20),
+      necroticLesionRatio: Math.round(35 + Math.random() * 30),
+      patternType: mainDisease.severity === "Critical" ? "Fungal Spore Mycelium & Lesion Decay" : "Foliar Chlorotic Bands & Spot Lesions",
+      patternTypeKannada: mainDisease.severity === "Critical" ? "ಶಿಲೀಂಧ್ರದ ಹರಡುವಿಕೆ ಮತ್ತು ಕೊಳೆತ ಮಚ್ಚೆಗಳು" : "ಎಲೆಯ ಬಣ್ಣ ಬದಲಾವಣೆ ಮತ್ತು ಮಚ್ಚೆಯ ಸಂರಚನೆ"
+    }
+  };
 }
