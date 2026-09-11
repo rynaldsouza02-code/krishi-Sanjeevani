@@ -15,10 +15,12 @@ export const Footer: React.FC<FooterProps> = ({ language = "en" }) => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
           <div className="space-y-3 md:col-span-2">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-agri-600 text-slate-950">
-                <Sprout className="w-5 h-5" />
-              </div>
+            <div className="flex items-center gap-2.5">
+              <img 
+                src="/logo.png" 
+                alt="ಕೃಷಿ ಸಂಜೀವಿನಿ Logo" 
+                className="w-8 h-8 rounded-lg shadow-sm object-cover"
+              />
               <span className="font-extrabold text-lg text-slate-900 dark:text-slate-100">ಕೃಷಿ ಸಂಜೀವಿನಿ</span>
             </div>
             <p className="text-slate-600 dark:text-slate-400 max-w-md leading-relaxed">

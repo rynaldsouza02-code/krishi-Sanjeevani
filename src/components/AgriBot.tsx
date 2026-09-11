@@ -105,9 +105,11 @@ export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
         {/* Top Chat Bar */}
         <div className="p-4 border-b border-slate-200 bg-slate-100/90 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-agri-600 flex items-center justify-center shadow-md">
-              <Bot className="w-5 h-5 text-white" />
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="AgriBot Logo" 
+              className="w-9 h-9 rounded-xl shadow-md object-cover" 
+            />
             <div>
               <span className="font-extrabold text-sm text-slate-900 block">AgriBot Assistant</span>
               <span className="text-[10px] text-agri-700 font-bold">Online • Ready for queries</span>

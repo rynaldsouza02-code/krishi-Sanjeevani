@@ -70,13 +70,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab("overview")}
             className="flex items-center gap-3 cursor-pointer group"
           >
-            {/* Cultural Logo Emblem: Sprout inside Golden Shield */}
-            <div className="relative p-2.5 rounded-2xl bg-gradient-to-tr from-emerald-700 via-agri-600 to-amber-500 shadow-md shadow-agri-600/30 group-hover:scale-105 transition-transform">
-              <Sprout className="w-6 h-6 text-white" />
-              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-amber-400 rounded-full border-2 border-white dark:border-slate-900 flex items-center justify-center text-[8px] font-bold text-slate-950">
-                ★
-              </div>
-            </div>
+            {/* App Logo Emblem */}
+            <img 
+              src="/logo.png" 
+              alt="ಕೃಷಿ ಸಂಜೀವಿನಿ Logo" 
+              className="w-10 h-10 rounded-xl shadow-md shadow-emerald-600/20 group-hover:scale-105 transition-transform object-cover"
+            />
             
             <div>
               <div className="flex items-center gap-2">

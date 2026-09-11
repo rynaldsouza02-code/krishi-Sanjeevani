@@ -5,6 +5,11 @@ export const metadata: Metadata = {
   title: "ಕೃಷಿ ಸಂಜೀವಿನಿ - Smart Sustainable Agriculture Suite",
   description: "AI-powered precision farming, crop recommendation, leaf disease diagnosis, and real-time monitoring across 31 districts of Karnataka.",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
