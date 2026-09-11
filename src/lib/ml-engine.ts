@@ -263,13 +263,41 @@ export interface DiseaseDiagnosisOutput {
     patternType: string;
     patternTypeKannada: string;
   };
+  isValidLeaf?: boolean;
+  unrecognizedReason?: string;
+  unrecognizedReasonKannada?: string;
 }
 
 /**
  * Plant Disease Inference Engine with Multi-Candidate Possibilities & Vision Metrics
  */
-export function diagnoseLeafDisease(sampleId?: string, imageMetrics?: { chlorosis?: number; lesion?: number }): DiseaseDiagnosisOutput {
+export function diagnoseLeafDisease(
+  sampleId?: string, 
+  imageMetrics?: { chlorosis?: number; lesion?: number; isValid?: boolean; reason?: string; reasonKannada?: string }
+): DiseaseDiagnosisOutput {
   let mainDisease = DISEASE_DATABASE[0];
+
+  if (imageMetrics && imageMetrics.isValid === false) {
+    return {
+      disease: mainDisease,
+      detectedPlantName: "Unrecognized / Non-Leaf",
+      detectedPlantKannada: "ಅನ್ವರ್ಗೀಕೃತ / ಎಲೆಯಲ್ಲದ ಫೋಟೋ",
+      detectedDiseaseName: "Non-Crop Object Detected",
+      detectedDiseaseKannada: "ಬೆಳೆ ಎಲೆಯಲ್ಲದ ವಸ್ತು ಪತ್ತೆಯಾಗಿದೆ",
+      scientificName: "N/A - Non Agricultural Image",
+      simulatedConfidence: 0,
+      allPossibilities: [],
+      visionFeatures: {
+        chlorosisScore: 0,
+        necroticLesionRatio: 0,
+        patternType: "Non-Foliar Pattern Detected",
+        patternTypeKannada: "ಎಲೆಯಲ್ಲದ ಫೋಟೋ ಸಂರಚನೆ"
+      },
+      isValidLeaf: false,
+      unrecognizedReason: imageMetrics.reason || "The uploaded image does not contain a recognizable crop leaf (e.g. fruits, faces, or non-agricultural objects detected). Please upload a clear photo of a plant leaf.",
+      unrecognizedReasonKannada: imageMetrics.reasonKannada || "ಅಪ್‌ಲೋಡ್ ಮಾಡಿದ ಫೋಟೋದಲ್ಲಿ ಬೆಳೆಯ ಎಲೆ ಪತ್ತೆಯಾಗಿಲ್ಲ (ಉದಾ. ಹಣ್ಣುಗಳು, ವಸ್ತುವಿನ ಚಿತ್ರಗಳು). ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
+    };
+  }
 
   if (sampleId) {
     const found = DISEASE_DATABASE.find(d => d.id === sampleId);
@@ -319,6 +347,7 @@ export function diagnoseLeafDisease(sampleId?: string, imageMetrics?: { chlorosi
       necroticLesionRatio: lesion,
       patternType: mainDisease.severity === "Critical" ? "Fungal Spore Mycelium & Lesion Decay" : "Foliar Chlorotic Bands & Spot Lesions",
       patternTypeKannada: mainDisease.severity === "Critical" ? "ಶಿಲೀಂಧ್ರದ ಹರಡುವಿಕೆ ಮತ್ತು ಕೊಳೆತ ಮಚ್ಚೆಗಳು" : "ಎಲೆಯ ಬಣ್ಣ ಬದಲಾವಣೆ ಮತ್ತು ಮಚ್ಚೆಯ ಸಂರಚನೆ"
-    }
+    },
+    isValidLeaf: true
   };
 }
