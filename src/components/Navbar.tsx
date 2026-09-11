@@ -70,12 +70,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab("overview")}
             className="flex items-center gap-3 cursor-pointer group"
           >
-            {/* App Logo Emblem */}
-            <img 
-              src="/logo.png" 
-              alt="ಕೃಷಿ ಸಂಜೀವಿನಿ Logo" 
-              className="w-10 h-10 rounded-xl shadow-md shadow-emerald-600/20 group-hover:scale-105 transition-transform object-cover"
-            />
+            {/* Cultural Logo Emblem: Uploaded Krishi Sanjeevani Brand Logo */}
+            <div className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-emerald-600 to-amber-500 shadow-md shadow-agri-600/30 group-hover:scale-105 transition-transform overflow-hidden">
+              <img src="/logo.png" alt="ಕೃಷಿ ಸಂಜೀವಿನಿ Logo" className="w-10 h-10 object-cover rounded-xl" />
+            </div>
             
             <div>
               <div className="flex items-center gap-2">

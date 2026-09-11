@@ -105,11 +105,9 @@ export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
         {/* Top Chat Bar */}
         <div className="p-4 border-b border-slate-200 bg-slate-100/90 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img 
-              src="/logo.png" 
-              alt="AgriBot Logo" 
-              className="w-9 h-9 rounded-xl shadow-md object-cover" 
-            />
+            <div className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center shadow-md overflow-hidden p-0.5">
+              <img src="/logo.png" alt="AgriBot Logo" className="w-full h-full object-cover rounded-lg" />
+            </div>
             <div>
               <span className="font-extrabold text-sm text-slate-900 block">AgriBot Assistant</span>
               <span className="text-[10px] text-agri-700 font-bold">Online • Ready for queries</span>
@@ -130,8 +128,8 @@ export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
               className={`flex gap-3 ${m.sender === "user" ? "justify-end" : "justify-start"}`}
             >
               {m.sender === "bot" && (
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center flex-shrink-0 mt-1">
-                  <Bot className="w-4 h-4 text-emerald-800" />
+                <div className="w-8 h-8 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center flex-shrink-0 mt-1 overflow-hidden p-0.5 shadow-sm">
+                  <img src="/logo.png" alt="AgriBot Logo" className="w-full h-full object-cover rounded-md" />
                 </div>
               )}
 
