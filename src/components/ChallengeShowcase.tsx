@@ -28,8 +28,8 @@ export const ChallengeShowcase: React.FC<ChallengeShowcaseProps> = ({ language =
 
         <h1 className="text-2xl md:text-4xl font-extrabold text-slate-900 dark:text-white">
           {language === "kn"
-            ? "ಕೃಷಿ ಸಂಜೀವಿನಿ: ಸುಧಾರಿತ ನಿಖರ ಕೃಷಿ ಮತ್ತು ಎಐ ಸಲಹಾ ವೇದಿಕೆ"
-            : "ಕೃಷಿ ಸಂಜೀವಿನಿ: Next-Gen Precision Agriculture & AI Advisory Suite"}
+            ? "ಕೃಷಿಸಂವರ್ಧಿ: ಸುಧಾರಿತ ನಿಖರ ಕೃಷಿ ಮತ್ತು ಎಐ ಸಲಹಾ ವೇದಿಕೆ"
+            : "ಕೃಷಿಸಂವರ್ಧಿ (Krishi Samvardhi): Next-Gen Precision Agriculture & AI Advisory Suite"}
         </h1>
 
         <p className="text-slate-700 dark:text-slate-300 text-sm md:text-base leading-relaxed font-medium">

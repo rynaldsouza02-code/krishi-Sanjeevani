@@ -188,7 +188,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
             </div>
 
             {/* Main Visual Viewport with Laser Beam Animation */}
-            <div className="relative w-full h-72 rounded-2xl overflow-hidden border-2 border-slate-300 bg-slate-950 group flex items-center justify-center">
+            <div className="relative w-full h-56 sm:h-72 rounded-2xl overflow-hidden border-2 border-slate-300 bg-slate-950 group flex items-center justify-center">
               
               <img 
                 src={currentImage} 
@@ -226,7 +226,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
               <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 block">
                 {language === "kn" ? "ಕರ್ನಾಟಕದ ಬೆಳೆ ಮಾದರಿಗಳನ್ನು ಪರೀಕ್ಷಿಸಿ:" : "Try Karnataka Crop Samples:"}
               </span>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {DISEASE_DATABASE.slice(0, 6).map((d) => (
                   <button
                     key={d.id}
@@ -421,7 +421,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
                     <Scan className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     {language === "kn" ? "ಎಲೆ ವಿಷುಯಲ್ ಲಕ್ಷಣಗಳ ವಿಶ್ಲೇಷಣೆ:" : "Computer Vision Feature Extraction:"}
                   </span>
-                  <div className="grid grid-cols-3 gap-3 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                     <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                       <span className="text-slate-500 dark:text-slate-400 block text-[11px]">
                         {language === "kn" ? "ಹಳದಿ ಬಣ್ಣದ ಶೇಕಡಾ (Chlorosis)" : "Foliar Chlorosis"}

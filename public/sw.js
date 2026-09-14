@@ -1,4 +1,4 @@
-const CACHE_NAME = 'krishi-sanjeevini-pwa-v2';
+const CACHE_NAME = 'krishi-samvardhi-pwa-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
@@ -32,7 +32,9 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Only intercept GET requests with valid HTTP/HTTPS schemes (ignore chrome-extension, moz-extension, etc.)
   if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith('http://') && !event.request.url.startsWith('https://')) return;
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
@@ -40,7 +42,7 @@ self.addEventListener('fetch', (event) => {
         // Return cached asset immediately, but update cache in background (Stale-While-Revalidate)
         fetch(event.request)
           .then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
+            if (networkResponse && networkResponse.status === 200 && (networkResponse.type === 'basic' || networkResponse.type === 'cors')) {
               caches.open(CACHE_NAME).then((cache) => {
                 cache.put(event.request, networkResponse);
               });
@@ -52,7 +54,7 @@ self.addEventListener('fetch', (event) => {
 
       return fetch(event.request)
         .then((response) => {
-          if (response && response.status === 200) {
+          if (response && response.status === 200 && (response.type === 'basic' || response.type === 'cors')) {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseClone);

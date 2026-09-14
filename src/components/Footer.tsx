@@ -17,9 +17,9 @@ export const Footer: React.FC<FooterProps> = ({ language = "en" }) => {
           <div className="space-y-3 md:col-span-2">
             <div className="flex items-center gap-2">
               <div className="p-0.5 rounded-lg bg-emerald-600 overflow-hidden shadow-sm">
-                <img src="/logo.png" alt="ಕೃಷಿ ಸಂಜೀವಿನಿ Logo" className="w-7 h-7 object-cover rounded-md" />
+                <img src="/logo.png" alt="ಕೃಷಿಸಂವರ್ಧಿ Logo" className="w-7 h-7 object-cover rounded-md" />
               </div>
-              <span className="font-extrabold text-lg text-slate-900 dark:text-slate-100">ಕೃಷಿ ಸಂಜೀವಿನಿ</span>
+              <span className="font-extrabold text-lg text-slate-900 dark:text-slate-100">ಕೃಷಿಸಂವರ್ಧಿ</span>
             </div>
             <p className="text-slate-600 dark:text-slate-400 max-w-md leading-relaxed">
               {language === "kn"
@@ -60,7 +60,7 @@ export const Footer: React.FC<FooterProps> = ({ language = "en" }) => {
         </div>
 
         <div className="border-t border-slate-200 dark:border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 dark:text-slate-400">
-          <p>© 2026 ಕೃಷಿ ಸಂಜೀವಿನಿ • Built By Rynal D Souza. All rights reserved.</p>
+          <p>© 2026 ಕೃಷಿಸಂವರ್ಧಿ (Krishi Samvardhi) • Built By Rynal D Souza. All rights reserved.</p>
           <div className="flex items-center gap-2">
             <span>Built By Rynal D Souza. All rights reserved.</span>
           </div>

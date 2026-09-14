@@ -84,7 +84,7 @@ export const DistrictSelector: React.FC<DistrictSelectorProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
             <div>
               <div className="flex items-center gap-3">
-                <h3 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">{activeDistrict.name}</h3>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100">{activeDistrict.name}</h3>
                 <span className="text-sm font-semibold text-agri-700 dark:text-agri-300 bg-emerald-50 dark:bg-emerald-950 px-3 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                   {activeDistrict.kannadaName}
                 </span>

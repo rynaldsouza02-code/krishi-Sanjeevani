@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  krishi-samvardhi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: krishi-samvardhi-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000

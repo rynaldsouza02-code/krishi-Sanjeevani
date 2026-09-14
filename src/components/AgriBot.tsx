@@ -18,15 +18,29 @@ interface AgriBotProps {
 export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
   const [inputMsg, setInputMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const quickPrompts = language === "kn" ? [
+    "ಅಡಿಕೆ ಕೊಳೆ ರೋಗ (ಮಹಳಿ) ಔಷಧ ಏನು?",
+    "ರಾಗಿ ಬೆಂಕಿ ರೋಗ ತಡೆಗಟ್ಟುವುದು ಹೇಗೆ?",
+    "ಕೃಷಿ ಭಾಗ್ಯ 90% ಸಬ್ಸಿಡಿ ಅರ್ಜಿ ಹೇಗೆ?",
+    "ಮಣ್ಣಿನ NPK ಮತ್ತು pH ಪರೀಕ್ಷೆ ಉಚಿತವೇ?",
+    "ಕರ್ನಾಟಕ ಎಪಿಎಂಸಿ ಬೆಳೆ ಮಾರುಕಟ್ಟೆ ದರ"
+  ] : [
+    "Arecanut Fruit Rot (Koleroga) spray?",
+    "Ragi Blast Disease resistant seeds?",
+    "Krishi Bhagya Drip Irrigation 90% Subsidy?",
+    "Ideal soil NPK & pH for Paddy?",
+    "Today's APMC Mandi rates in Karnataka"
+  ];
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       sender: "bot",
       text: language === "kn"
-        ? "ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಕೃಷಿ AI ಸಹಾಯಕ. ಬೆಳೆ ಶಿಫಾರಸು, ಎಲೆ ರೋಗ, ಮಣ್ಣಿನ ಸಾರಜನಕ ಮತ್ತು ಸಬ್ಸಿಡಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ನನ್ನನ್ನು ಕೇಳಿ."
-        : "Greetings! I am AgriBot, your AI Precision Agriculture Advisor. Ask me anything about crop diseases, Karnataka soil health, fertilizer dosage, or government schemes.",
+        ? "ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಕೃಷಿ AI ಸಹಾಯಕ (Gemini LLM Knowledge Engine). ಬೆಳೆ ಶಿಫಾರಸು, ಎಲೆ ರೋಗ, ಮಣ್ಣಿನ ಸಾರಜನಕ (NPK) ಮತ್ತು ಸರ್ಕಾರಿ ಸಬ್ಸಿಡಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಯಾವುದನ್ನಾದರೂ ಉಚಿತವಾಗಿ ಕೇಳಿ!"
+        : "Greetings! I am AgriBot powered by Gemini LLM Precision Agricultural Engine. Ask me anything about crop leaf diseases, Karnataka soil NPK health, organic remedies, or government schemes in English or Kannada (ಕನ್ನಡ)!",
       timestamp: new Date().toLocaleTimeString(),
-      recommendedActions: ["Arecanut Fruit Rot treatment", "Krishi Bhagya 90% Drip Subsidy", "Ragi Blast Disease control"]
+      recommendedActions: quickPrompts
     }
   ]);
 
@@ -100,7 +114,7 @@ export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
       </div>
 
       {/* Chat Interface Container */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col h-[580px] overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col h-[75vh] sm:h-[580px] max-h-[580px] overflow-hidden">
         
         {/* Top Chat Bar */}
         <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-100/90 dark:bg-slate-950/90 flex items-center justify-between">

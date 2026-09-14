@@ -73,7 +73,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, selectedDistrictId, la
           <Award className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
           <span>{language === "kn" ? "ಎಐ ಕೃಷಿ ಸ್ಪರ್ಧೆ 2026" : "AI in Agriculture Challenge 2026"}</span>
           <span className="text-emerald-400">•</span>
-          <span className="text-emerald-900 dark:text-emerald-200 font-bold">ಕೃಷಿ ಸಂಜೀವಿನಿ</span>
+          <span className="text-emerald-900 dark:text-emerald-200 font-bold">ಕೃಷಿಸಂವರ್ಧಿ</span>
         </div>
 
         {/* Main Headline & Description */}
@@ -82,7 +82,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, selectedDistrictId, la
           <div className="lg:col-span-7 space-y-6">
             <div className="space-y-2">
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-                ಕೃಷಿ ಸಂಜೀವಿನಿ <br />
+                ಕೃಷಿಸಂವರ್ಧಿ <br />
                 <span className="text-gradient">
                   {language === "kn" ? "ಎಐ ಸುಧಾರಿತ ನಿಖರ ಕೃಷಿ ವೇದಿಕೆ" : "AI Precision Farming Suite"}
                 </span>
@@ -170,7 +170,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, selectedDistrictId, la
                   <div className="w-3 h-3 rounded-full bg-red-400"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                   <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                  <span className="text-xs font-mono text-slate-500 dark:text-slate-400 ml-2">krishi-sanjeevini.ai.sys</span>
+                  <span className="text-xs font-mono text-slate-500 dark:text-slate-400 ml-2">krishi-samvardhi.ai.sys</span>
                 </div>
                 <span className="text-xs font-bold text-agri-700 dark:text-agri-400 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 px-2.5 py-0.5 rounded-full">
                   {language === "kn" ? "ಎಐ ಸಕ್ರಿಯವಾಗಿದೆ" : "AI Active"}

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ಕೃಷಿ ಸಂಜೀವಿನಿ - Smart Sustainable Agriculture Suite",
+  title: "ಕೃಷಿಸಂವರ್ಧಿ - Krishi Samvardhi | Smart Sustainable Agriculture Suite",
   description: "AI-powered precision farming, crop recommendation, leaf disease diagnosis, and real-time monitoring across 31 districts of Karnataka.",
   manifest: "/manifest.json",
   icons: {
@@ -10,10 +10,11 @@ export const metadata: Metadata = {
     shortcut: "/logo.png",
     apple: "/logo.png",
   },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "ಕೃಷಿ ಸಂಜೀವಿನಿ",
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
+    "apple-mobile-web-app-title": "ಕೃಷಿಸಂವರ್ಧಿ",
   },
 };
 
@@ -21,7 +22,7 @@ export const viewport: Viewport = {
   themeColor: "#16a34a",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -33,8 +34,10 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
-      <body className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased transition-colors duration-300">
+      <body className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased transition-colors duration-300 overflow-x-hidden">
         {children}
         <script
           dangerouslySetInnerHTML={{
@@ -43,10 +46,10 @@ export default function RootLayout({
                 window.addEventListener('load', function() {
                   navigator.serviceWorker.register('/sw.js').then(
                     function(registration) {
-                      console.log('ಕೃಷಿ ಸಂಜೀವಿನಿ PWA ServiceWorker registered: ', registration.scope);
+                      console.log('ಕೃಷಿಸಂವರ್ಧಿ PWA ServiceWorker registered: ', registration.scope);
                     },
                     function(err) {
-                      console.log('ಕೃಷಿ ಸಂಜೀವಿನಿ PWA ServiceWorker registration failed: ', err);
+                      console.log('ಕೃಷಿಸಂವರ್ಧಿ PWA ServiceWorker registration failed: ', err);
                     }
                   );
                 });

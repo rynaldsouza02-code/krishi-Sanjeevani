@@ -65,7 +65,7 @@ export default function Home() {
       <div className="min-h-screen bg-slate-50 text-slate-900 flex items-center justify-center">
         <div className="text-center space-y-3">
           <div className="w-10 h-10 border-4 border-agri-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-xs text-agri-700 font-mono font-bold">Loading ಕೃಷಿ ಸಂಜೀವಿನಿ Suite...</p>
+          <p className="text-xs text-agri-700 font-mono font-bold">Loading ಕೃಷಿಸಂವರ್ಧಿ (Krishi Samvardhi) Suite...</p>
         </div>
       </div>
     );
@@ -99,7 +99,7 @@ export default function Home() {
       />
 
       {/* Main Tabbed Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-12">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 pb-24 sm:pb-12 space-y-12">
         
         {/* Tab 1: Overview */}
         {activeTab === "overview" && (

@@ -136,7 +136,7 @@ export const RealtimeMonitoring: React.FC<RealtimeMonitoringProps> = ({
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-700 shadow-sm flex flex-wrap items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-3">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
-            <span className="font-mono font-extrabold text-slate-900 dark:text-white">
+            <span className="font-mono font-extrabold text-slate-900 dark:text-white truncate max-w-[200px] sm:max-w-none">
               {language === "kn" ? "ಸ್ಟೇಷನ್ ಐಡಿ:" : "Station ID:"} KSNDMC-GOV-{activeDistrict.name.toUpperCase().replace(/\s+/g, '')}-04
             </span>
             <span className="text-slate-300 dark:text-slate-700">|</span>

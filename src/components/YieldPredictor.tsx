@@ -145,7 +145,7 @@ export const YieldPredictor: React.FC<YieldPredictorProps> = ({ selectedDistrict
           {/* Irrigation Method */}
           <div className="space-y-1.5">
             <label className="text-xs text-slate-900 dark:text-slate-200 block font-bold">Irrigation Method</label>
-            <div className="grid grid-cols-3 gap-2 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
               {(["Rainfed", "Drip", "Canal/Borewell"] as const).map((m) => (
                 <button
                   key={m}
@@ -165,7 +165,7 @@ export const YieldPredictor: React.FC<YieldPredictorProps> = ({ selectedDistrict
           {/* Fertilizer Practice */}
           <div className="space-y-1.5">
             <label className="text-xs text-slate-900 dark:text-slate-200 block font-bold">Fertilizer Practice</label>
-            <div className="grid grid-cols-3 gap-2 text-[11px]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
               {(["Organic", "Standard Balanced", "Excessive Chemical"] as const).map((f) => (
                 <button
                   key={f}
