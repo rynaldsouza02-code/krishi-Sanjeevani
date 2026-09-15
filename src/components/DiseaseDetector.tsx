@@ -33,19 +33,21 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
       isValid?: boolean; 
       reason?: string; 
       reasonKannada?: string 
-    }
+    },
+    overrideImageBase64?: string | null
   ) => {
     setIsScanning(true);
     setDiagnosis(null);
 
     const targetSampleId = sampleId || selectedSampleId;
+    const activeImageBase64 = overrideImageBase64 !== undefined ? overrideImageBase64 : customImage;
 
     try {
       const res = await fetch("/api/diagnose-disease", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          imageBase64: customImage,
+          imageBase64: activeImageBase64,
           sampleId: targetSampleId,
           language
         })
@@ -92,78 +94,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
         if (event.target?.result) {
           const dataUrl = event.target.result as string;
           setCustomImage(dataUrl);
-
-          // Client-side HTML5 Canvas Computer Vision Feature Extraction & Foliar Validation
-          const img = new Image();
-          img.onload = () => {
-            try {
-              const canvas = document.createElement("canvas");
-              const ctx = canvas.getContext("2d");
-              if (ctx) {
-                canvas.width = 100;
-                canvas.height = 100;
-                ctx.drawImage(img, 0, 0, 100, 100);
-                const pixels = ctx.getImageData(0, 0, 100, 100).data;
-                let greenFoliage = 0;
-                let chloroticYellow = 0;
-                let necroticBrown = 0;
-                let nonLeafColorCount = 0;
-
-                for (let i = 0; i < pixels.length; i += 4) {
-                  const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
-
-                  // Green foliage detection
-                  const isGreen = (g > r * 0.88 && g > b * 1.05 && g > 30) || (g > 55 && g > r && g > b);
-                  // Yellow chlorosis on leaf
-                  const isYellow = (r > 110 && g > 100 && b < 120 && Math.abs(r - g) < 60);
-                  // Necrotic leaf lesion / brown spots
-                  const isBrown = (r > 30 && r < 150 && g > 25 && g < 130 && b < 90 && (g >= b || r >= b) && Math.abs(r - g) < 55);
-
-                  if (isGreen) {
-                    greenFoliage++;
-                  } else if (isYellow) {
-                    chloroticYellow++;
-                  } else if (isBrown) {
-                    necroticBrown++;
-                  } else {
-                    // Non-leaf indicators (bright red/orange fruits, skin tones, vibrant blue/purple)
-                    const isOrangeFruitOrRed = (r > 150 && r > g * 1.2 && b < 110);
-                    const isSkinTone = (r > 175 && g > 115 && b > 85 && r > g && g > b);
-                    const isBlueOrPurple = (b > g * 1.25 && b > 90);
-                    if (isOrangeFruitOrRed || isSkinTone || isBlueOrPurple) {
-                      nonLeafColorCount++;
-                    }
-                  }
-                }
-
-                const totalLeafPixels = greenFoliage + chloroticYellow + necroticBrown;
-                const leafRatio = totalLeafPixels / 10000;
-                const nonLeafRatio = nonLeafColorCount / 10000;
-
-                const isValid = leafRatio >= 0.18 && nonLeafRatio < 0.38;
-
-                const chlorosis = Math.min(92, Math.max(20, Math.round((chloroticYellow / 10000) * 100 * 3.5)));
-                const lesion = Math.min(88, Math.max(15, Math.round((necroticBrown / 10000) * 100 * 3.0)));
-
-                if (!isValid) {
-                  handleScan(undefined, {
-                    chlorosis: 0,
-                    lesion: 0,
-                    isValid: false,
-                    reason: "The uploaded image does not contain a recognizable crop leaf. Non-leaf objects (such as fruits, faces, or background clutter) were detected.",
-                    reasonKannada: "ಅಪ್‌ಲೋಡ್ ಮಾಡಿದ ಫೋಟೋದಲ್ಲಿ ಸಸ್ಯದ ಎಲೆ ಪತ್ತೆಯಾಗಿಲ್ಲ. ಎಲೆಯಲ್ಲದ ವಸ್ತುಗಳು (ಉದಾ. ಹಣ್ಣುಗಳು, ವ್ಯಕ್ತಿಗಳು ಅಥವಾ ಇತರೆ ವಸ್ತುಗಳು) ಕಂಡುಬಂದಿವೆ."
-                  });
-                } else {
-                  handleScan(undefined, { chlorosis, lesion, isValid: true });
-                }
-                return;
-              }
-            } catch (err) {
-              // fallback
-            }
-            handleScan();
-          };
-          img.src = dataUrl;
+          handleScan(undefined, undefined, dataUrl);
         }
       };
       reader.readAsDataURL(file);
