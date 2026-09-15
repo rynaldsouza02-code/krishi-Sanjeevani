@@ -32,7 +32,7 @@ export const DISEASE_DATABASE: PlantDisease[] = [
     scientificName: "Phytophthora meadii",
     severity: "Critical",
     confidence: 96.4,
-    imageUrl: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&q=80",
+    imageUrl: "",
     govtSource: "ICAR-CPCRI Regional Station Advisory Bulletin (Vittal, Mangaluru)",
     govtSourceKannada: "ಐಸಿಎಎಆರ್ - ಸಿಪಿಸಿಆರ್ಐ ಪ್ರಾದೇಶಿಕ ಕೃಷಿ ಸಂಶೋಧನಾ ಕೇಂದ್ರ (ವಿಟ್ಲ/ಮಂಗಳೂರು)",
     symptoms: [
@@ -87,7 +87,7 @@ export const DISEASE_DATABASE: PlantDisease[] = [
     scientificName: "Magnaporthe oryzae",
     severity: "High",
     confidence: 94.8,
-    imageUrl: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80",
+    imageUrl: "",
     govtSource: "UAS Bengaluru / UAS Dharwad Package of Practices (Ragi Tech Manual)",
     govtSourceKannada: "ಕೃಷಿ ವಿಶ್ವವಿದ್ಯಾನಿಲಯ ಬೆಂಗಳೂರು/ಧಾರವಾಡ ಸುಧಾರಿತ ಕೃಷಿ ಕೈಪಿಡಿ",
     symptoms: [
@@ -138,7 +138,7 @@ export const DISEASE_DATABASE: PlantDisease[] = [
     scientificName: "Colletotrichum falcatum",
     severity: "Critical",
     confidence: 98.1,
-    imageUrl: "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&q=80",
+    imageUrl: "",
     govtSource: "ICAR-Sugarcane Breeding Institute & Mandya Sugarcane Research Station",
     govtSourceKannada: "ಐಸಿಎಆರ್ ಕಬ್ಬು ತಳಿ ಸಂಶೋಧನಾ ಸಂಸ್ಥೆ ಮತ್ತು ಮಂಡ್ಯ ಕಬ್ಬು ಸಂಶೋಧನಾ ಕೇಂದ್ರ",
     symptoms: [
@@ -189,7 +189,7 @@ export const DISEASE_DATABASE: PlantDisease[] = [
     scientificName: "Pectinophora gossypiella",
     severity: "High",
     confidence: 92.5,
-    imageUrl: "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=800&q=80",
+    imageUrl: "",
     govtSource: "ICAR-Central Institute for Cotton Research (CICR) Advisory",
     govtSourceKannada: "ಐಸಿಎಆರ್ ಕೇಂದ್ರೀಯ ಹತ್ತಿ ಸಂಶೋಧನಾ ಸಂಸ್ಥೆ (ಸಿಐಸಿಆರ್)",
     symptoms: [
@@ -242,7 +242,7 @@ export const DISEASE_DATABASE: PlantDisease[] = [
     scientificName: "Xanthomonas oryzae",
     severity: "High",
     confidence: 95.2,
-    imageUrl: "https://images.unsplash.com/photo-1536657464919-892534f60d6e?w=800&q=80",
+    imageUrl: "",
     govtSource: "ICAR-Indian Institute of Rice Research (IIRR) Bulletins",
     govtSourceKannada: "ಐಸಿಎಆರ್ ಭಾರತೀಯ ಭತ್ತ ಸಂಶೋಧನಾ ಸಂಸ್ಥೆ (IIRR)",
     symptoms: [
@@ -293,7 +293,7 @@ export const DISEASE_DATABASE: PlantDisease[] = [
     scientificName: "Alternaria solani",
     severity: "Medium",
     confidence: 93.7,
-    imageUrl: "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=800&q=80",
+    imageUrl: "",
     govtSource: "IIHR Hesaraghatta & UAS Bengaluru Advisory Bulletin",
     govtSourceKannada: "ಭಾರತೀಯ ತೋಟಗಾರಿಕಾ ಸಂಶೋಧನಾ ಸಂಸ್ಥೆ (IIHR ಹೆಸರುಘಟ್ಟ)",
     symptoms: [

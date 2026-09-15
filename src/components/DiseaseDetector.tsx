@@ -105,7 +105,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
   };
 
   const activeDisease = diagnosis?.disease;
-  const currentImage = customImage || (selectedSampleId ? DISEASE_DATABASE.find(d => d.id === selectedSampleId)?.imageUrl : null);
+  const currentImage = customImage;
 
   return (
     <div className="space-y-6">
@@ -210,32 +210,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
 
             </div>
 
-            {/* Sample Selector Buttons */}
-            <div className="space-y-2">
-              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 block">
-                {language === "kn" ? "ಕರ್ನಾಟಕದ ಬೆಳೆ ಮಾದರಿಗಳನ್ನು ಪರೀಕ್ಷಿಸಿ:" : "Try Karnataka Crop Samples:"}
-              </span>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {DISEASE_DATABASE.slice(0, 6).map((d) => (
-                  <button
-                    key={d.id}
-                    onClick={() => {
-                      setCustomImage(null);
-                      setSelectedSampleId(d.id);
-                      handleScan(d.id);
-                    }}
-                    className={`p-2 rounded-xl text-left border transition-all text-xs cursor-pointer ${
-                      selectedSampleId === d.id && !customImage
-                        ? "bg-emerald-100 dark:bg-emerald-950 border-emerald-400 dark:border-emerald-600 text-emerald-900 dark:text-emerald-100 font-extrabold shadow-sm"
-                        : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
-                    }`}
-                  >
-                    <span className="block truncate font-bold">{language === "kn" ? (d.cropKannadaName || d.cropName) : d.cropName}</span>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">{language === "kn" ? d.kannadaName : d.diseaseName.split("(")[0]}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+
 
             {/* Custom Upload Button */}
             <div className="relative">
