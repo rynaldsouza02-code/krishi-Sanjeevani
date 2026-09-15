@@ -23,9 +23,9 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
   const [selectedSampleId, setSelectedSampleId] = useState<string>("arecanut-koleroga");
   const [customImage, setCustomImage] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
-  const [diagnosis, setDiagnosis] = useState<DiseaseDiagnosisOutput | null>(null);
+  const [diagnosis, setDiagnosis] = useState<(DiseaseDiagnosisOutput & { isAiPowered?: boolean; aiEngine?: string }) | null>(null);
 
-  const handleScan = (
+  const handleScan = async (
     sampleId?: string, 
     customMetrics?: { 
       chlorosis?: number; 
@@ -38,9 +38,40 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
     setIsScanning(true);
     setDiagnosis(null);
 
+    const targetSampleId = sampleId || selectedSampleId;
+
+    try {
+      const res = await fetch("/api/diagnose-disease", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageBase64: customImage,
+          sampleId: targetSampleId,
+          language
+        })
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        setDiagnosis(result);
+        setIsScanning(false);
+        if (result.isValidLeaf !== false) {
+          confetti({ particleCount: 45, spread: 65, origin: { y: 0.6 } });
+        }
+        return;
+      }
+    } catch (err) {
+      console.error("Gemini Vision AI diagnosis call error, using local fallback", err);
+    }
+
+    // Fallback to local engine
     setTimeout(() => {
-      const result = diagnoseLeafDisease(sampleId || selectedSampleId, customMetrics);
-      setDiagnosis(result);
+      const result = diagnoseLeafDisease(targetSampleId, customMetrics);
+      setDiagnosis({
+        ...result,
+        isAiPowered: false,
+        aiEngine: "Local Computer Vision Engine"
+      });
       setIsScanning(false);
       
       if (result.isValidLeaf !== false) {
@@ -50,7 +81,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
           origin: { y: 0.6 }
         });
       }
-    }, 2000);
+    }, 1500);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -343,14 +374,21 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
               <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-emerald-300 dark:border-emerald-800 shadow-xl space-y-6">
                 
                 {/* Government Research Source Verification Banner */}
-                <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700 flex items-center gap-2.5 text-xs text-emerald-950 dark:text-emerald-200 font-semibold">
-                  <FileCheck className="w-5 h-5 text-emerald-700 dark:text-emerald-400 flex-shrink-0" />
-                  <div>
-                    <span className="font-extrabold block text-emerald-900 dark:text-emerald-300">
-                      {language === "kn" ? "ಸರ್ಕಾರಿ ಸಂಶೋಧನಾ ಆಧಾರಿತ ಮಾಹಿತಿ:" : "Government Verified Advisory Source:"}
-                    </span>
-                    <span className="text-slate-800 dark:text-slate-200">{language === "kn" ? (activeDisease.govtSourceKannada || activeDisease.govtSource) : activeDisease.govtSource}</span>
+                <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700 flex items-center justify-between gap-2.5 text-xs text-emerald-950 dark:text-emerald-200 font-semibold">
+                  <div className="flex items-center gap-2.5">
+                    <FileCheck className="w-5 h-5 text-emerald-700 dark:text-emerald-400 flex-shrink-0" />
+                    <div>
+                      <span className="font-extrabold block text-emerald-900 dark:text-emerald-300">
+                        {language === "kn" ? "ಸರ್ಕಾರಿ ಸಂಶೋಧನಾ ಆಧಾರಿತ ಮಾಹಿತಿ:" : "Government Verified Advisory Source:"}
+                      </span>
+                      <span className="text-slate-800 dark:text-slate-200">{language === "kn" ? (activeDisease.govtSourceKannada || activeDisease.govtSource) : activeDisease.govtSource}</span>
+                    </div>
                   </div>
+                  {diagnosis?.isAiPowered && (
+                    <span className="px-2.5 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-900 dark:text-indigo-200 border border-indigo-300 dark:border-indigo-700 font-extrabold text-[11px] flex items-center gap-1 shadow-sm">
+                      ✨ Gemini 1.5 Flash AI
+                    </span>
+                  )}
                 </div>
 
                 {/* Plant & Disease Dual AI Recognition Display */}
