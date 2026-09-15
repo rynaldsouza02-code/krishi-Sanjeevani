@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { diagnoseLeafDisease, DiseaseDiagnosisOutput } from "@/lib/ml-engine";
-import { DISEASE_DATABASE } from "@/data/disease-database";
+import { DISEASE_DATABASE, PlantDisease } from "@/data/disease-database";
 
 export const dynamic = 'force-dynamic';
 
