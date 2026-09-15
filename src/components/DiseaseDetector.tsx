@@ -40,8 +40,8 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
     setIsScanning(true);
     setDiagnosis(null);
 
-    const targetSampleId = sampleId || selectedSampleId;
     const activeImageBase64 = overrideImageBase64 !== undefined ? overrideImageBase64 : customImage;
+    const targetSampleId = activeImageBase64 ? "" : (sampleId !== undefined ? sampleId : selectedSampleId);
 
     try {
       const res = await fetch("/api/diagnose-disease", {
@@ -70,7 +70,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
 
     // Fallback to local engine
     setTimeout(() => {
-      const result = diagnoseLeafDisease(targetSampleId, customMetrics);
+      const result = diagnoseLeafDisease(targetSampleId || undefined, customMetrics);
       setDiagnosis({
         ...result,
         isAiPowered: false,
@@ -95,8 +95,9 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
       reader.onload = (event) => {
         if (event.target?.result) {
           const dataUrl = event.target.result as string;
+          setSelectedSampleId("");
           setCustomImage(dataUrl);
-          handleScan(undefined, undefined, dataUrl);
+          handleScan("", undefined, dataUrl);
         }
       };
       reader.readAsDataURL(file);
