@@ -20,7 +20,7 @@ interface DiseaseDetectorProps {
 }
 
 export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) => {
-  const [selectedSampleId, setSelectedSampleId] = useState<string>("arecanut-koleroga");
+  const [selectedSampleId, setSelectedSampleId] = useState<string>("");
   const [customImage, setCustomImage] = useState<string | null>(null);
   const [userGeminiKey, setUserGeminiKey] = useState<string>("");
   const [isScanning, setIsScanning] = useState<boolean>(false);
@@ -105,7 +105,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
   };
 
   const activeDisease = diagnosis?.disease;
-  const currentImage = customImage || DISEASE_DATABASE.find(d => d.id === selectedSampleId)?.imageUrl || DISEASE_DATABASE[0].imageUrl;
+  const currentImage = customImage || (selectedSampleId ? DISEASE_DATABASE.find(d => d.id === selectedSampleId)?.imageUrl : null);
 
   return (
     <div className="space-y-6">
@@ -145,21 +145,43 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
             
             <div className="flex items-center justify-between">
               <span className="text-xs font-extrabold text-slate-900 dark:text-white">
-                {language === "kn" ? "ಎಲೆ ಮಾದರಿ ಶೋಧಕ" : "Leaf Sample Scanner"}
+                {language === "kn" ? "ಎಲೆ ಮಾದರಿ ಶೋಧಕ" : "Leaf Photo Scanner"}
               </span>
               <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                {language === "kn" ? "ಮಾದರಿ ಆಯ್ಕೆ ಮಾಡಿ ಅಥವಾ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ" : "Select sample or upload photo"}
+                {language === "kn" ? "ಬೆಳೆಯ ಎಲೆಯ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ" : "Upload your crop leaf photo"}
               </span>
             </div>
 
-            {/* Main Visual Viewport with Laser Beam Animation */}
-            <div className="relative w-full h-56 sm:h-72 rounded-2xl overflow-hidden border-2 border-slate-300 bg-slate-950 group flex items-center justify-center">
+            {/* Main Visual Viewport with Dropzone if no image, or laser animation when image present */}
+            <div className="relative w-full h-56 sm:h-72 rounded-2xl overflow-hidden border-2 border-dashed border-emerald-400/80 dark:border-emerald-700/80 bg-slate-950 group flex items-center justify-center">
               
-              <img 
-                src={currentImage} 
-                alt="Leaf Sample" 
-                className={`w-full h-full object-cover transition-all duration-500 ${isScanning ? "scale-105 filter brightness-110" : ""}`}
-              />
+              {currentImage ? (
+                <img 
+                  src={currentImage} 
+                  alt="Uploaded Leaf Sample" 
+                  className={`w-full h-full object-cover transition-all duration-500 ${isScanning ? "scale-105 filter brightness-110" : ""}`}
+                />
+              ) : (
+                <label
+                  htmlFor="leaf-upload-input"
+                  className="w-full h-full flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:bg-slate-900/60 transition-colors"
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-3 group-hover:scale-110 transition-transform">
+                    <Upload className="w-7 h-7" />
+                  </div>
+                  <span className="text-sm font-extrabold text-white block">
+                    {language === "kn" ? "ಬೆಳೆಯ ಎಲೆಯ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ" : "Upload Crop Leaf Photo"}
+                  </span>
+                  <span className="text-xs text-slate-400 mt-1 block max-w-xs">
+                    {language === "kn"
+                      ? "ರೋಗ ಪತ್ತೆಗಾಗಿ ನಿಮ್ಮ ಹೊಲದ ಎಲೆಯ ಫೋಟೋ ಆಯ್ಕೆ ಮಾಡಿ (JPG, PNG)"
+                      : "Drag & drop or click to upload your field crop leaf photo (JPG, PNG)"}
+                  </span>
+                  <span className="mt-3 px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all">
+                    {language === "kn" ? "ಫೋಟೋ ಆಯ್ಕೆ ಮಾಡಿ" : "Browse & Upload Photo"}
+                  </span>
+                </label>
+              )}
 
               {/* Laser Beam Scanner Overlay */}
               {isScanning && (
@@ -169,10 +191,10 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
                     <div className="text-center space-y-2">
                       <RefreshCw className="w-8 h-8 text-agri-400 animate-spin mx-auto" />
                       <span className="text-xs font-bold text-slate-200 block">
-                        {language === "kn" ? "ಎಲೆ ರೋಗಾಣುಗಳ ವಿಶ್ಲೇಷಣೆ ನಡೆಯುತ್ತಿದೆ..." : "Analyzing Leaf Pathogens..."}
+                        {language === "kn" ? "ಜೆಮಿನಿ AI ಎಲೆ ರೋಗ ಶೋಧನೆ ನಡೆಯುತ್ತಿದೆ..." : "Gemini AI Analyzing Leaf..."}
                       </span>
                       <span className="text-[10px] text-agri-400 font-mono">
-                        {language === "kn" ? "ವಿಷನ್ ಕಂಪ್ಯೂಟಿಂಗ್ ಚಾಲನೆಯಲ್ಲಿದೆ" : "Neural Net Multimodal Inference"}
+                        {language === "kn" ? "ವಿಷನ್ ಕಂಪ್ಯೂಟಿಂಗ್ ಚಾಲನೆಯಲ್ಲಿದೆ" : "Google Gemini 1.5 Flash Vision Scan"}
                       </span>
                     </div>
                   </div>
@@ -180,9 +202,11 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
               )}
 
               {/* Badges */}
-              <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md text-[11px] font-mono text-slate-200 border border-slate-700">
-                📷 1080p Leaf Macro
-              </div>
+              {currentImage && (
+                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md text-[11px] font-mono text-slate-200 border border-slate-700">
+                  📷 Uploaded Leaf Macro
+                </div>
+              )}
 
             </div>
 

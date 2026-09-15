@@ -32,7 +32,7 @@ export const DISEASE_DATABASE: PlantDisease[] = [
     scientificName: "Phytophthora meadii",
     severity: "Critical",
     confidence: 96.4,
-    imageUrl: "https://images.unsplash.com/photo-1599598425947-020645547488?w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&q=80",
     govtSource: "ICAR-CPCRI Regional Station Advisory Bulletin (Vittal, Mangaluru)",
     govtSourceKannada: "ಐಸಿಎಎಆರ್ - ಸಿಪಿಸಿಆರ್ಐ ಪ್ರಾದೇಶಿಕ ಕೃಷಿ ಸಂಶೋಧನಾ ಕೇಂದ್ರ (ವಿಟ್ಲ/ಮಂಗಳೂರು)",
     symptoms: [
@@ -87,7 +87,7 @@ export const DISEASE_DATABASE: PlantDisease[] = [
     scientificName: "Magnaporthe oryzae",
     severity: "High",
     confidence: 94.8,
-    imageUrl: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80",
     govtSource: "UAS Bengaluru / UAS Dharwad Package of Practices (Ragi Tech Manual)",
     govtSourceKannada: "ಕೃಷಿ ವಿಶ್ವವಿದ್ಯಾನಿಲಯ ಬೆಂಗಳೂರು/ಧಾರವಾಡ ಸುಧಾರಿತ ಕೃಷಿ ಕೈಪಿಡಿ",
     symptoms: [
@@ -138,7 +138,7 @@ export const DISEASE_DATABASE: PlantDisease[] = [
     scientificName: "Colletotrichum falcatum",
     severity: "Critical",
     confidence: 98.1,
-    imageUrl: "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&q=80",
     govtSource: "ICAR-Sugarcane Breeding Institute & Mandya Sugarcane Research Station",
     govtSourceKannada: "ಐಸಿಎಆರ್ ಕಬ್ಬು ತಳಿ ಸಂಶೋಧನಾ ಸಂಸ್ಥೆ ಮತ್ತು ಮಂಡ್ಯ ಕಬ್ಬು ಸಂಶೋಧನಾ ಕೇಂದ್ರ",
     symptoms: [
