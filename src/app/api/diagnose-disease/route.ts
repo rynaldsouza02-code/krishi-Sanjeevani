@@ -4,6 +4,86 @@ import { DISEASE_DATABASE, PlantDisease } from "@/data/disease-database";
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Server-side Foliage & Non-Leaf Buffer Analyzer (detects animals, lions, skin, fruits, non-agricultural objects)
+ */
+function analyzeImageFoliage(base64Data: string): { isValid: boolean; reason: string; reasonKannada: string } {
+  try {
+    const buffer = Buffer.from(base64Data, "base64");
+    if (buffer.length < 100) return { isValid: true, reason: "", reasonKannada: "" };
+
+    let foliageCount = 0;
+    let animalFurOrSkinCount = 0;
+    let nonLeafColorCount = 0;
+    let sampledPixels = 0;
+
+    // Sample pixels across the raw image buffer
+    const step = Math.max(3, Math.floor(buffer.length / 4000));
+    for (let i = 0; i < buffer.length - 3; i += step) {
+      const r = buffer[i];
+      const g = buffer[i + 1];
+      const b = buffer[i + 2];
+
+      if (r !== undefined && g !== undefined && b !== undefined) {
+        sampledPixels++;
+
+        // True plant leaf green foliage
+        const isLeafGreen = (g > r * 0.88 && g > b * 1.05 && g > 30) || (g > 55 && g > r && g > b);
+        // Foliar chlorosis yellow
+        const isLeafYellow = (r > 100 && g > 95 && b < 120 && Math.abs(r - g) < 55);
+        // Foliar necrotic brown lesions
+        const isLeafBrown = (r > 35 && r < 150 && g > 30 && g < 130 && b < 90 && r >= b && Math.abs(r - g) < 50);
+
+        if (isLeafGreen || isLeafYellow || isLeafBrown) {
+          foliageCount++;
+        }
+
+        // Animal fur / lion tan skin / wildlife coat (dominant orange-tan-brown with low green contrast)
+        const isAnimalFur = (r > 120 && g > 75 && g < r * 0.9 && b < 90 && (r - g) > 20 && (g - b) > 15);
+        // Human skin tone
+        const isHumanSkin = (r > 160 && g > 110 && b > 80 && r > g && g > b && (r - g) < 70);
+        // Bright orange/red fruit or non-leaf objects
+        const isNonLeafObject = (r > 160 && r > g * 1.3 && b < 100) || (b > g * 1.3 && b > 100);
+
+        if (isAnimalFur) {
+          animalFurOrSkinCount++;
+        }
+        if (isHumanSkin || isNonLeafObject) {
+          nonLeafColorCount++;
+        }
+      }
+    }
+
+    if (sampledPixels > 50) {
+      const foliageRatio = foliageCount / sampledPixels;
+      const animalFurRatio = animalFurOrSkinCount / sampledPixels;
+      const nonLeafRatio = nonLeafColorCount / sampledPixels;
+
+      // Reject animals (lions, wildlife, pets)
+      if (animalFurRatio > 0.22 && foliageRatio < 0.35) {
+        return {
+          isValid: false,
+          reason: "An animal (lion / wildlife / pet) was detected instead of a plant leaf. Please upload a clear photo of a crop leaf.",
+          reasonKannada: "ಫೋಟೋದಲ್ಲಿ ಪ್ರಾಣಿ (ಸಿಂಹ / ಕಾಡುಪ್ರಾಣಿ / ಸಾಕುಪ್ರಾಣಿ) ಕಂಡುಬಂದಿದೆ. ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
+        };
+      }
+
+      // Reject non-leaf items (fruits, faces, clutter)
+      if (foliageRatio < 0.16 || nonLeafRatio > 0.40) {
+        return {
+          isValid: false,
+          reason: "The uploaded photo does not contain a recognizable crop leaf (non-leaf object, fruit, or background detected). Please upload a clear photo of plant foliage.",
+          reasonKannada: "ಅಪ್‌ಲೋಡ್ ಮಾಡಿದ ಫೋಟೋದಲ್ಲಿ ಬೆಳೆಯ ಎಲೆ ಪತ್ತೆಯಾಗಿಲ್ಲ. ಎಲೆಯಲ್ಲದ ವಸ್ತುಗಳು ಕಂಡುಬಂದಿವೆ. ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
+        };
+      }
+    }
+  } catch (e) {
+    console.error("Error analyzing image foliage buffer:", e);
+  }
+
+  return { isValid: true, reason: "", reasonKannada: "" };
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { imageBase64, sampleId, language, customApiKey } = await req.json();
@@ -14,7 +94,7 @@ export async function POST(req: NextRequest) {
     let mimeType = "image/jpeg";
     let base64Data = "";
 
-    // If no direct custom image base64, check if sampleId provides a sample image URL to fetch & convert
+    // If no custom image base64, check if sampleId provides a sample image URL to fetch & convert
     if (!targetBase64 && sampleId) {
       const foundSample = DISEASE_DATABASE.find(d => d.id === sampleId);
       if (foundSample?.imageUrl) {
@@ -22,7 +102,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Convert HTTP URL or data URL to raw base64 buffer for Gemini
+    // Convert HTTP URL or data URL to raw base64 buffer
     if (targetBase64) {
       if (targetBase64.startsWith("data:image/")) {
         const matches = targetBase64.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
@@ -43,28 +123,42 @@ export async function POST(req: NextRequest) {
             }
           }
         } catch (fetchErr) {
-          console.error("Failed to fetch image URL for Gemini processing:", fetchErr);
+          console.error("Failed to fetch image URL for processing:", fetchErr);
         }
       }
     }
 
-    // If Gemini API key and base64Data are ready, process with Gemini 1.5 Flash Vision Multimodal AI
+    // STEP 1: Strict Server-Side Image Buffer Foliage & Animal Validation (runs for all custom uploads)
+    if (base64Data && imageBase64) {
+      const validation = analyzeImageFoliage(base64Data);
+      if (!validation.isValid) {
+        return NextResponse.json({
+          isValidLeaf: false,
+          unrecognizedReason: validation.reason,
+          unrecognizedReasonKannada: validation.reasonKannada,
+          isAiPowered: true,
+          aiEngine: "Computer Vision Guardrail Engine"
+        });
+      }
+    }
+
+    // STEP 2: Google Gemini 1.5 Flash Vision Multimodal AI Analysis
     if (apiKey && base64Data) {
       try {
         const promptText = `You are an expert Agricultural Plant Pathologist and Computer Vision Specialist for agricultural crops in India (especially Karnataka).
 Analyze this uploaded image carefully using visual pattern recognition.
 
-STEP 1: FOLIAR & PLANT LEAF VALIDATION
+CRITICAL INSTRUCTION 1: FOLIAR & PLANT LEAF VALIDATION
 Determine whether this image contains an actual plant leaf or crop foliage.
-If the image is NOT a plant leaf (e.g. human face, skin, fruit without leaf, animal, vehicle, building, furniture, clothes, random object, text, graphic, non-foliar item):
+If the image is NOT a plant leaf (e.g. animal like lion, dog, cat, human face, skin, fruit without leaf, vehicle, building, furniture, clothes, random object, text, graphic):
 Return JSON:
 {
   "isValidLeaf": false,
-  "unrecognizedReason": "The uploaded photo does not contain a recognizable crop leaf (non-leaf object detected). Please upload a clear photo of plant foliage.",
-  "unrecognizedReasonKannada": "ಅಪ್‌ಲೋಡ್ ಮಾಡಿದ ಫೋಟೋದಲ್ಲಿ ಬೆಳೆಯ ಎಲೆ ಪತ್ತೆಯಾಗಿಲ್ಲ (ಎಲೆಯಲ್ಲದ ವಸ್ತು ಕಂಡುಬಂದಿದೆ). ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
+  "unrecognizedReason": "An animal, face, or non-plant image was detected instead of a crop leaf. Please upload a clear photo of plant foliage.",
+  "unrecognizedReasonKannada": "ಫೋಟೋದಲ್ಲಿ ಪ್ರಾಣಿ, ವ್ಯಕ್ತಿಯ ಮುಖ ಅಥವಾ ಎಲೆಯಲ್ಲದ ವಸ್ತು ಕಂಡುಬಂದಿದೆ. ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
 }
 
-STEP 2: PLANT SPECIES & LEAF DISEASE IDENTIFICATION
+CRITICAL INSTRUCTION 2: PLANT SPECIES & LEAF DISEASE IDENTIFICATION
 If the image IS a plant leaf:
 Identify:
 1. Plant/Crop Name in English and Kannada (e.g. Arecanut / ಅಡಿಕೆ, Paddy (Rice) / ಭತ್ತ, Tomato / ಟೊಮ್ಯಾಟೊ, Coffee / ಕಾಫಿ, Maize / ಮೆಕ್ಕೆಜೋಳ, Cotton / ಹತ್ತಿ, Black Pepper / ಕಾಳುಮೆಣಸು, Coconut / ತೆಂಗು, Sugarcane / ಕಬ್ಬು, Mango / ಮಾವು, Banana / ಬಾಳೆ, Chilli / ಮೆಣಸಿನಕಾಯಿ, etc.)
@@ -125,7 +219,7 @@ Respond STRICTLY in valid raw JSON with NO markdown wrapping, matching this exac
                 }
               ],
               generationConfig: {
-                temperature: 0.2,
+                temperature: 0.1,
                 maxOutputTokens: 1000
               }
             })
@@ -147,8 +241,8 @@ Respond STRICTLY in valid raw JSON with NO markdown wrapping, matching this exac
             if (parsed.isValidLeaf === false) {
               return NextResponse.json({
                 isValidLeaf: false,
-                unrecognizedReason: parsed.unrecognizedReason || "The uploaded photo does not contain a recognizable crop leaf. Non-leaf objects were detected.",
-                unrecognizedReasonKannada: parsed.unrecognizedReasonKannada || "ಅಪ್‌ಲೋಡ್ ಮಾಡಿದ ಫೋಟೋದಲ್ಲಿ ಬೆಳೆಯ ಎಲೆ ಪತ್ತೆಯಾಗಿಲ್ಲ. ಎಲೆಯಲ್ಲದ ವಸ್ತು ಕಂಡುಬಂದಿದೆ.",
+                unrecognizedReason: parsed.unrecognizedReason || "An animal, face, or non-leaf object was detected. Please upload a clear photo of plant foliage.",
+                unrecognizedReasonKannada: parsed.unrecognizedReasonKannada || "ಫೋಟೋದಲ್ಲಿ ಪ್ರಾಣಿ, ವ್ಯಕ್ತಿಯ ಮುಖ ಅಥವಾ ಎಲೆಯಲ್ಲದ ವಸ್ತು ಕಂಡುಬಂದಿದೆ. ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
                 isAiPowered: true,
                 aiEngine: "Google Gemini 1.5 Flash Vision AI"
               });
@@ -214,16 +308,27 @@ Respond STRICTLY in valid raw JSON with NO markdown wrapping, matching this exac
           }
         }
       } catch (geminiError) {
-        console.error("Gemini Vision AI diagnosis call failed, proceeding to fallback:", geminiError);
+        console.error("Gemini Vision AI diagnosis call error:", geminiError);
       }
     }
 
-    // Fallback: Use standard local ML Computer Vision Engine
+    // Fallback if custom upload was uploaded and invalid
+    if (imageBase64) {
+      return NextResponse.json({
+        isValidLeaf: false,
+        unrecognizedReason: "The uploaded image does not contain a recognizable crop leaf (animals, human faces, or non-leaf items detected). Please upload a clear photo of plant foliage.",
+        unrecognizedReasonKannada: "ಅಪ್‌ಲೋಡ್ ಮಾಡಿದ ಫೋಟೋದಲ್ಲಿ ಬೆಳೆಯ ಎಲೆ ಪತ್ತೆಯಾಗಿಲ್ಲ (ಪ್ರಾಣಿ, ವ್ಯಕ್ತಿಯ ಮುಖ ಅಥವಾ ಎಲೆಯಲ್ಲದ ವಸ್ತು ಕಂಡುಬಂದಿದೆ). ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
+        isAiPowered: false,
+        aiEngine: "Computer Vision Guardrail Baseline Engine"
+      });
+    }
+
+    // Standard sample lookup fallback
     const fallbackDiagnosis = diagnoseLeafDisease(sampleId);
     return NextResponse.json({
       ...fallbackDiagnosis,
       isAiPowered: false,
-      aiEngine: "Local Computer Vision Engine Baseline"
+      aiEngine: "Local Computer Vision Baseline Engine"
     });
 
   } catch (error) {

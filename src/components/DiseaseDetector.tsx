@@ -22,6 +22,7 @@ interface DiseaseDetectorProps {
 export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) => {
   const [selectedSampleId, setSelectedSampleId] = useState<string>("arecanut-koleroga");
   const [customImage, setCustomImage] = useState<string | null>(null);
+  const [userGeminiKey, setUserGeminiKey] = useState<string>("");
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [diagnosis, setDiagnosis] = useState<(DiseaseDiagnosisOutput & { isAiPowered?: boolean; aiEngine?: string }) | null>(null);
 
@@ -49,7 +50,8 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
         body: JSON.stringify({
           imageBase64: activeImageBase64,
           sampleId: targetSampleId,
-          language
+          language,
+          customApiKey: userGeminiKey
         })
       });
 
