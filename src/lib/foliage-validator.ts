@@ -12,7 +12,7 @@ export interface FoliageValidationResult {
  */
 export function validatePixelArray(pixels: Uint8ClampedArray | Buffer | number[]): FoliageValidationResult {
   let leafGreenPixels = 0;
-  let warmAnimalFurPixels = 0;
+  let animalFurOrSkinPixels = 0;
   let totalPixels = Math.floor(pixels.length / 4);
 
   if (totalPixels === 0) {
@@ -24,33 +24,34 @@ export function validatePixelArray(pixels: Uint8ClampedArray | Buffer | number[]
     const g = pixels[i + 1];
     const b = pixels[i + 2];
 
-    // Plant foliage check: Green component is strong relative to Red & Blue
-    // Includes healthy green, light green, chlorotic yellow-green leaf tissue
+    // Genuine plant foliage: Green is dominant over Red and Blue
+    // Green leaf / chlorosis foliage: G > R * 1.02 and G > B * 1.05
     const isFoliage = 
-      (g > 35 && g > r * 0.82 && g > b * 1.02) || 
-      (g > 50 && g >= r && g >= b) ||
-      (g > 55 && r > 45 && Math.abs(g - r) < 30 && b < g * 0.75);
+      (g > r * 1.02 && g > b * 1.05 && g > 35) || 
+      (g > 55 && g > r && g > b * 1.12 && b < 140);
 
-    // Animal fur / Lion / Tiger / Dog / Cat / Skin check: Warm golden brown/orange
-    // R is significantly higher than G, and G is higher than B (brown/tawny/orange fur)
+    // Animal fur / Lion / Tiger / Dog / Cat / Human face / Warm brown / Yellowish tawny:
+    // Red is greater than or equal to Green (R >= G), and Red > Blue + 15
     const isAnimalFurOrSkin = 
-      (r > g + 16 && g > b + 10 && r > 75) || 
-      (r > 115 && g > 75 && b < 70 && (r - g) > 22);
+      (r >= g && r > b + 15 && r > 55) || 
+      (r > g + 10 && r > 65) ||
+      (r > 110 && g > 70 && b < 95 && (r - g) > 8);
 
     if (isFoliage) leafGreenPixels++;
-    if (isAnimalFurOrSkin) warmAnimalFurPixels++;
+    if (isAnimalFurOrSkin) animalFurOrSkinPixels++;
   }
 
   const leafPixelRatio = leafGreenPixels / totalPixels;
-  const animalFurRatio = warmAnimalFurPixels / totalPixels;
+  const animalFurRatio = animalFurOrSkinPixels / totalPixels;
 
-  if (animalFurRatio > 0.20 || leafPixelRatio < 0.08) {
+  // If animal fur/skin/brown/tawny pixels exceed 15% OR foliage green pixels are under 10%, flag as invalid non-leaf!
+  if (animalFurRatio > 0.15 || leafPixelRatio < 0.10) {
     return {
       isValidLeaf: false,
       leafPixelRatio,
       animalFurRatio,
-      reason: "An animal, lion, face, or non-agricultural object was detected instead of a plant leaf. Please upload a clear photo of crop foliage.",
-      reasonKannada: "ಫೋಟೋದಲ್ಲಿ ಪ್ರಾಣಿ (ಸಿಂಹ/ಕಾಡುಪ್ರಾಣಿ), ಮುಖ ಅಥವಾ ಎಲೆಯಲ್ಲದ ವಸ್ತು ಕಂಡುಬಂದಿದೆ. ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
+      reason: "An animal (lion/wildlife/pet), face, or non-agricultural photo was detected instead of a plant leaf. Please upload a clear photo of crop foliage.",
+      reasonKannada: "ಫೋಟೋದಲ್ಲಿ ಪ್ರಾಣಿ (ಸಿಂಹ/ಕಾಡುಪ್ರಾಣಿ), ಮುಖ ಅಥವಾ ಎಲೆಯಲ್ಲದ ವಸ್ತು ಪತ್ತೆಯಾಗಿದೆ. ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
     };
   }
 
@@ -66,13 +67,17 @@ export function validatePixelArray(pixels: Uint8ClampedArray | Buffer | number[]
  */
 export function analyzeImageOnCanvas(dataUrl: string): Promise<FoliageValidationResult> {
   return new Promise((resolve) => {
-    if (typeof window === "undefined" || typeof document === "undefined") {
+    if (typeof window === "undefined" || typeof document === "undefined" || !dataUrl) {
       resolve({ isValidLeaf: true, leafPixelRatio: 1, animalFurRatio: 0 });
       return;
     }
 
     const img = new Image();
-    img.crossOrigin = "Anonymous";
+    // Do NOT set crossOrigin for data: URIs as browser security rejects data URIs with crossOrigin
+    if (!dataUrl.startsWith("data:")) {
+      img.crossOrigin = "Anonymous";
+    }
+
     img.onload = () => {
       try {
         const canvas = document.createElement("canvas");
@@ -92,9 +97,57 @@ export function analyzeImageOnCanvas(dataUrl: string): Promise<FoliageValidation
         resolve({ isValidLeaf: true, leafPixelRatio: 1, animalFurRatio: 0 });
       }
     };
-    img.onerror = () => {
+    img.onerror = (e) => {
+      console.error("Canvas image load error:", e);
       resolve({ isValidLeaf: true, leafPixelRatio: 1, animalFurRatio: 0 });
     };
     img.src = dataUrl;
   });
+}
+
+/**
+ * Server-side base64 buffer validator for Node.js API environment
+ */
+export function validateBase64FoliageServer(base64Str: string): FoliageValidationResult {
+  try {
+    const rawBuffer = Buffer.from(base64Str, "base64");
+    if (rawBuffer.length < 500) {
+      return { isValidLeaf: true, leafPixelRatio: 1, animalFurRatio: 0 };
+    }
+
+    let leafGreenPixels = 0;
+    let animalFurPixels = 0;
+    let sampledBytes = 0;
+
+    // Sample RGB-like byte triplets across JPEG/PNG buffer payload
+    for (let i = 100; i < rawBuffer.length - 3; i += 3) {
+      const r = rawBuffer[i];
+      const g = rawBuffer[i + 1];
+      const b = rawBuffer[i + 2];
+      sampledBytes++;
+
+      if (g > r * 1.05 && g > b * 1.05 && g > 40) {
+        leafGreenPixels++;
+      } else if (r >= g && r > b + 15 && r > 60) {
+        animalFurPixels++;
+      }
+    }
+
+    const leafRatio = leafGreenPixels / sampledBytes;
+    const animalRatio = animalFurPixels / sampledBytes;
+
+    if (animalRatio > 0.18 || leafRatio < 0.08) {
+      return {
+        isValidLeaf: false,
+        leafPixelRatio: leafRatio,
+        animalFurRatio: animalRatio,
+        reason: "An animal (lion/wildlife/pet), face, or non-agricultural photo was detected. Please upload a clear photo of plant foliage.",
+        reasonKannada: "ಫೋಟೋದಲ್ಲಿ ಪ್ರಾಣಿ (ಸಿಂಹ/ಕಾಡುಪ್ರಾಣಿ), ಮುಖ ಅಥವಾ ಎಲೆಯಲ್ಲದ ವಸ್ತು ಪತ್ತೆಯಾಗಿದೆ. ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
+      };
+    }
+  } catch (err) {
+    console.error("Server base64 validation error:", err);
+  }
+
+  return { isValidLeaf: true, leafPixelRatio: 1, animalFurRatio: 0 };
 }

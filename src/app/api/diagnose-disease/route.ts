@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { diagnoseLeafDisease, DiseaseDiagnosisOutput } from "@/lib/ml-engine";
 import { DISEASE_DATABASE, PlantDisease } from "@/data/disease-database";
+import { validateBase64FoliageServer } from "@/lib/foliage-validator";
 
 export const dynamic = 'force-dynamic';
 
@@ -217,15 +218,18 @@ Respond STRICTLY in valid raw JSON with NO markdown codeblock formatting.`;
       }
     }
 
-    // Standard fallback response
-    if (!sampleId && targetBase64 && clientValidation?.isValidLeaf === false) {
-      return NextResponse.json({
-        isValidLeaf: false,
-        unrecognizedReason: clientValidation?.reason || "An animal, lion, face, or non-agricultural object was detected. Please upload a clear photo of plant foliage.",
-        unrecognizedReasonKannada: clientValidation?.reasonKannada || "ಫೋಟೋದಲ್ಲಿ ಪ್ರಾಣಿ (ಸಿಂಹ/ಕಾಡುಪ್ರಾಣಿ), ಮುಖ ಅಥವಾ ಎಲೆಯಲ್ಲದ ವಸ್ತು ಕಂಡುಬಂದಿದೆ. ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
-        isAiPowered: false,
-        aiEngine: "Local Computer Vision Engine"
-      });
+    // Standard fallback response: Perform server-side base64 foliage check if targetBase64 is custom upload
+    if (!sampleId && base64Data) {
+      const serverCheck = validateBase64FoliageServer(base64Data);
+      if (!serverCheck.isValidLeaf || clientValidation?.isValidLeaf === false) {
+        return NextResponse.json({
+          isValidLeaf: false,
+          unrecognizedReason: serverCheck.reason || clientValidation?.reason || "An animal (lion/wildlife/pet), face, or non-agricultural object was detected. Please upload a clear photo of plant foliage.",
+          unrecognizedReasonKannada: serverCheck.reasonKannada || clientValidation?.reasonKannada || "ಫೋಟೋದಲ್ಲಿ ಪ್ರಾಣಿ (ಸಿಂಹ/ಕಾಡುಪ್ರಾಣಿ), ಮುಖ ಅಥವಾ ಎಲೆಯಲ್ಲದ ವಸ್ತು ಕಂಡುಬಂದಿದೆ. ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
+          isAiPowered: false,
+          aiEngine: "Computer Vision Foliage Inspector"
+        });
+      }
     }
 
     const fallbackDiagnosis = diagnoseLeafDisease(sampleId);
