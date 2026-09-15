@@ -127,7 +127,13 @@ Respond STRICTLY in valid raw JSON with NO markdown wrapping, matching this exac
                      d.diseaseName.toLowerCase().includes(parsed.detectedDiseaseName?.toLowerCase())
               ) || DISEASE_DATABASE[0];
 
-              const customDiseaseObj = {
+              const toArray = (val: any, fallback: string[]): string[] => {
+                if (Array.isArray(val)) return val;
+                if (typeof val === "string" && val.trim()) return [val.trim()];
+                return fallback;
+              };
+
+              const customDiseaseObj: PlantDisease = {
                 ...matchedSample,
                 id: `gemini-${Date.now()}`,
                 cropName: parsed.detectedPlantName || matchedSample.cropName,
@@ -137,16 +143,16 @@ Respond STRICTLY in valid raw JSON with NO markdown wrapping, matching this exac
                 scientificName: parsed.scientificName || matchedSample.scientificName,
                 confidence: parsed.confidence || 92,
                 severity: (parsed.severity as any) || matchedSample.severity,
-                symptoms: parsed.symptoms || matchedSample.symptoms,
-                symptomsKannada: parsed.symptomsKannada || matchedSample.symptomsKannada,
-                cause: parsed.cause || matchedSample.cause,
-                causeKannada: parsed.causeKannada || matchedSample.causeKannada,
-                organicTreatment: parsed.organicTreatment || matchedSample.organicTreatment,
-                organicTreatmentKannada: parsed.organicTreatmentKannada || matchedSample.organicTreatmentKannada,
-                chemicalTreatment: parsed.chemicalTreatment || matchedSample.chemicalTreatment,
-                chemicalTreatmentKannada: parsed.chemicalTreatmentKannada || matchedSample.chemicalTreatmentKannada,
-                preventiveMeasures: parsed.preventiveMeasures || matchedSample.preventiveMeasures,
-                preventiveMeasuresKannada: parsed.preventiveMeasuresKannada || matchedSample.preventiveMeasuresKannada,
+                symptoms: toArray(parsed.symptoms, matchedSample.symptoms),
+                symptomsKannada: toArray(parsed.symptomsKannada, matchedSample.symptomsKannada),
+                favorableConditions: parsed.cause || matchedSample.favorableConditions,
+                favorableConditionsKannada: parsed.causeKannada || matchedSample.favorableConditionsKannada,
+                organicTreatment: toArray(parsed.organicTreatment, matchedSample.organicTreatment),
+                organicTreatmentKannada: toArray(parsed.organicTreatmentKannada, matchedSample.organicTreatmentKannada),
+                chemicalTreatment: toArray(parsed.chemicalTreatment, matchedSample.chemicalTreatment),
+                chemicalTreatmentKannada: toArray(parsed.chemicalTreatmentKannada, matchedSample.chemicalTreatmentKannada),
+                prevention: toArray(parsed.preventiveMeasures, matchedSample.prevention),
+                preventionKannada: toArray(parsed.preventiveMeasuresKannada, matchedSample.preventionKannada),
               };
 
               const responseData: DiseaseDiagnosisOutput & { isAiPowered: boolean; aiEngine: string } = {
