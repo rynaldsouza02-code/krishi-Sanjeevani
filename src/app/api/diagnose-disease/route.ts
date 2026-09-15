@@ -6,7 +6,18 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const { imageBase64, sampleId, language, customApiKey } = await req.json();
+    const { imageBase64, sampleId, language, customApiKey, clientValidation } = await req.json();
+
+    // Early Rejection if Client-side Foliage Inspector flagged non-leaf / animal photo
+    if (clientValidation && clientValidation.isValidLeaf === false) {
+      return NextResponse.json({
+        isValidLeaf: false,
+        unrecognizedReason: clientValidation.reason || "An animal, lion, face, or non-agricultural object was detected. Please upload a clear photo of crop foliage.",
+        unrecognizedReasonKannada: clientValidation.reasonKannada || "ಫೋಟೋದಲ್ಲಿ ಪ್ರಾಣಿ (ಸಿಂಹ/ಕಾಡುಪ್ರಾಣಿ), ಮುಖ ಅಥವಾ ಎಲೆಯಲ್ಲದ ವಸ್ತು ಕಂಡುಬಂದಿದೆ. ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
+        isAiPowered: true,
+        aiEngine: "Computer Vision Foliage Inspector"
+      });
+    }
 
     const apiKey = customApiKey || process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
@@ -206,11 +217,21 @@ Respond STRICTLY in valid raw JSON with NO markdown codeblock formatting.`;
       }
     }
 
-    // Standard fallback: Accept leaf photo upload gracefully and return diagnosis
+    // Standard fallback response
+    if (!sampleId && targetBase64 && clientValidation?.isValidLeaf === false) {
+      return NextResponse.json({
+        isValidLeaf: false,
+        unrecognizedReason: clientValidation?.reason || "An animal, lion, face, or non-agricultural object was detected. Please upload a clear photo of plant foliage.",
+        unrecognizedReasonKannada: clientValidation?.reasonKannada || "ಫೋಟೋದಲ್ಲಿ ಪ್ರಾಣಿ (ಸಿಂಹ/ಕಾಡುಪ್ರಾಣಿ), ಮುಖ ಅಥವಾ ಎಲೆಯಲ್ಲದ ವಸ್ತು ಕಂಡುಬಂದಿದೆ. ದಯವಿಟ್ಟು ಸಸ್ಯದ ಎಲೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
+        isAiPowered: false,
+        aiEngine: "Local Computer Vision Engine"
+      });
+    }
+
     const fallbackDiagnosis = diagnoseLeafDisease(sampleId);
     return NextResponse.json({
       ...fallbackDiagnosis,
-      isValidLeaf: true, // Always accept uploaded leaf photos in fallback mode
+      isValidLeaf: clientValidation?.isValidLeaf !== false,
       isAiPowered: false,
       aiEngine: "Local Computer Vision Baseline Engine"
     });

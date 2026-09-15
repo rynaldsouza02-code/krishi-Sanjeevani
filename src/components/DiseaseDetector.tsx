@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { DISEASE_DATABASE, PlantDisease } from "@/data/disease-database";
 import { diagnoseLeafDisease, DiseaseDiagnosisOutput } from "@/lib/ml-engine";
+import { analyzeImageOnCanvas } from "@/lib/foliage-validator";
 import confetti from "canvas-confetti";
 
 interface DiseaseDetectorProps {
@@ -43,6 +44,44 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
     const activeImageBase64 = overrideImageBase64 !== undefined ? overrideImageBase64 : customImage;
     const targetSampleId = activeImageBase64 ? "" : (sampleId !== undefined ? sampleId : selectedSampleId);
 
+    // Client-side Canvas Foliage Validation
+    let clientValidation: { isValidLeaf: boolean; reason?: string; reasonKannada?: string } = { isValidLeaf: true };
+    if (activeImageBase64) {
+      const checkResult = await analyzeImageOnCanvas(activeImageBase64);
+      clientValidation = {
+        isValidLeaf: checkResult.isValidLeaf,
+        reason: checkResult.reason,
+        reasonKannada: checkResult.reasonKannada
+      };
+
+      // If Canvas Foliage Inspector rejected non-leaf / animal photo
+      if (!checkResult.isValidLeaf) {
+        setDiagnosis({
+          disease: DISEASE_DATABASE[0],
+          detectedPlantName: "Unrecognized / Non-Leaf Image",
+          detectedPlantKannada: "ಅನ್ವರ್ಗೀಕೃತ / ಎಲೆಯಲ್ಲದ ಫೋಟೋ",
+          detectedDiseaseName: "Animal / Non-Agricultural Object Detected",
+          detectedDiseaseKannada: "ಪ್ರಾಣಿ / ಎಲೆಯಲ್ಲದ ವಸ್ತು ಪತ್ತೆಯಾಗಿದೆ",
+          scientificName: "N/A - Non-Agricultural Image",
+          simulatedConfidence: 0,
+          allPossibilities: [],
+          visionFeatures: {
+            chlorosisScore: 0,
+            necroticLesionRatio: 0,
+            patternType: "Non-Foliar Pattern Detected",
+            patternTypeKannada: "ಎಲೆಯಲ್ಲದ ಫೋಟೋ ಸಂರಚನೆ"
+          },
+          isValidLeaf: false,
+          unrecognizedReason: checkResult.reason,
+          unrecognizedReasonKannada: checkResult.reasonKannada,
+          isAiPowered: true,
+          aiEngine: "Computer Vision Foliage Inspector"
+        });
+        setIsScanning(false);
+        return;
+      }
+    }
+
     try {
       const res = await fetch("/api/diagnose-disease", {
         method: "POST",
@@ -51,7 +90,8 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
           imageBase64: activeImageBase64,
           sampleId: targetSampleId,
           language,
-          customApiKey: userGeminiKey
+          customApiKey: userGeminiKey,
+          clientValidation
         })
       });
 
@@ -70,7 +110,12 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
 
     // Fallback to local engine
     setTimeout(() => {
-      const result = diagnoseLeafDisease(targetSampleId || undefined, customMetrics);
+      const result = diagnoseLeafDisease(targetSampleId || undefined, {
+        ...customMetrics,
+        isValid: clientValidation.isValidLeaf,
+        reason: clientValidation.reason,
+        reasonKannada: clientValidation.reasonKannada
+      });
       setDiagnosis({
         ...result,
         isAiPowered: false,
@@ -85,7 +130,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
           origin: { y: 0.6 }
         });
       }
-    }, 1500);
+    }, 1200);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
