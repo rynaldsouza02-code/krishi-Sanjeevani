@@ -18,6 +18,18 @@ interface AgriBotProps {
 export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
   const [inputMsg, setInputMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userApiKey, setUserApiKey] = useState("");
+
+  useEffect(() => {
+    const savedKey = localStorage.getItem("agri-gemini-key");
+    if (savedKey) setUserApiKey(savedKey);
+  }, []);
+
+  const handleSaveApiKey = (key: string) => {
+    setUserApiKey(key);
+    localStorage.setItem("agri-gemini-key", key);
+  };
+
   const quickPrompts = language === "kn" ? [
     "ಅಡಿಕೆ ಕೊಳೆ ರೋಗ (ಮಹಳಿ) ಔಷಧ ಏನು?",
     "ರಾಗಿ ಬೆಂಕಿ ರೋಗ ತಡೆಗಟ್ಟುವುದು ಹೇಗೆ?",
@@ -37,8 +49,8 @@ export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
       id: "1",
       sender: "bot",
       text: language === "kn"
-        ? "ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಕೃಷಿ AI ಸಹಾಯಕ (Gemini LLM Knowledge Engine). ಬೆಳೆ ಶಿಫಾರಸು, ಎಲೆ ರೋಗ, ಮಣ್ಣಿನ ಸಾರಜನಕ (NPK) ಮತ್ತು ಸರ್ಕಾರಿ ಸಬ್ಸಿಡಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಯಾವುದನ್ನಾದರೂ ಉಚಿತವಾಗಿ ಕೇಳಿ!"
-        : "Greetings! I am AgriBot powered by Gemini LLM Precision Agricultural Engine. Ask me anything about crop leaf diseases, Karnataka soil NPK health, organic remedies, or government schemes in English or Kannada (ಕನ್ನಡ)!",
+        ? "ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಕೃಷಿ AI ಸಹಾಯಕ (Google Gemini AI). ಬೆಳೆ ಶಿಫಾರಸು, ಎಲೆ ರೋಗ, ಮಣ್ಣಿನ ಸಾರಜನಕ (NPK) ಮತ್ತು ಸರ್ಕಾರಿ ಸಬ್ಸಿಡಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಯಾವುದನ್ನಾದರೂ ಉಚಿತವಾಗಿ ಕೇಳಿ!"
+        : "Greetings! I am AgriBot powered by Google Gemini AI. Ask me anything about crop leaf diseases, Karnataka soil NPK health, organic remedies, or government schemes in English or Kannada (ಕನ್ನಡ)!",
       timestamp: new Date().toLocaleTimeString(),
       recommendedActions: quickPrompts
     }
@@ -73,7 +85,11 @@ export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
       const res = await fetch("/api/agribot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: textToSend, language })
+        body: JSON.stringify({ 
+          message: textToSend, 
+          language,
+          customApiKey: userApiKey
+        })
       });
       const data = await res.json();
 
@@ -92,6 +108,7 @@ export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="space-y-6">
@@ -128,10 +145,20 @@ export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
             </div>
           </div>
 
-          <div className="text-xs text-slate-600 dark:text-slate-300 font-bold flex items-center gap-1">
-            <Globe className="w-3.5 h-3.5" />
-            <span>{language === "kn" ? "ಕನ್ನಡ" : "English"}</span>
+          <div className="flex items-center gap-2">
+            <input
+              type="password"
+              placeholder="Gemini API Key (Optional)..."
+              value={userApiKey}
+              onChange={(e) => handleSaveApiKey(e.target.value)}
+              className="px-2.5 py-1 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-agri-500 w-44"
+            />
+            <div className="text-xs text-slate-600 dark:text-slate-300 font-bold flex items-center gap-1">
+              <Globe className="w-3.5 h-3.5" />
+              <span>{language === "kn" ? "ಕನ್ನಡ" : "English"}</span>
+            </div>
           </div>
+
         </div>
 
         {/* Message Thread */}
