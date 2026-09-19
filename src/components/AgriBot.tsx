@@ -110,6 +110,74 @@ export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
   };
 
 
+  const renderFormattedMessage = (text: string) => {
+    if (!text) return null;
+
+    // Split text into paragraphs/lines
+    const lines = text.split("\n").filter((l) => l.trim().length > 0);
+
+    return (
+      <div className="space-y-2 text-xs md:text-sm">
+        {lines.map((line, idx) => {
+          const trimmed = line.trim();
+
+          // Helper to parse **bold** syntax
+          const parseBold = (str: string) => {
+            const parts = str.split(/(\*\*.*?\*\*)/g);
+            return parts.map((part, pIdx) => {
+              if (part.startsWith("**") && part.endsWith("**")) {
+                return (
+                  <strong key={pIdx} className="font-extrabold text-slate-900 dark:text-white">
+                    {part.slice(2, -2)}
+                  </strong>
+                );
+              }
+              return part;
+            });
+          };
+
+          // Match numbered lists: "1. ", "2. ", "3. "
+          const numMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
+          if (numMatch) {
+            const num = numMatch[1];
+            const content = numMatch[2];
+            return (
+              <div key={idx} className="flex items-start gap-2.5 p-2 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 my-1">
+                <span className="w-5 h-5 rounded-lg bg-emerald-600 text-white font-extrabold text-xs flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                  {num}
+                </span>
+                <div className="flex-1 text-slate-800 dark:text-slate-200 font-medium leading-relaxed">
+                  {parseBold(content)}
+                </div>
+              </div>
+            );
+          }
+
+          // Match bullet points: "- ", "* ", "• "
+          const bulletMatch = trimmed.match(/^[-*•]\s+(.*)/);
+          if (bulletMatch) {
+            const content = bulletMatch[1];
+            return (
+              <div key={idx} className="flex items-start gap-2 pl-2 py-0.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0"></span>
+                <div className="flex-1 text-slate-800 dark:text-slate-200 font-medium leading-relaxed">
+                  {parseBold(content)}
+                </div>
+              </div>
+            );
+          }
+
+          // Standard paragraph line
+          return (
+            <p key={idx} className="leading-relaxed">
+              {parseBold(trimmed)}
+            </p>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       
@@ -174,14 +242,15 @@ export const AgriBot: React.FC<AgriBotProps> = ({ language }) => {
                 </div>
               )}
 
-              <div className={`max-w-[80%] space-y-2 ${m.sender === "user" ? "items-end" : "items-start"}`}>
-                <div className={`p-4 rounded-2xl text-xs md:text-sm leading-relaxed ${
+              <div className={`max-w-[85%] space-y-2 ${m.sender === "user" ? "items-end" : "items-start"}`}>
+                <div className={`p-4 rounded-2xl ${
                   m.sender === "user"
-                    ? "bg-agri-600 text-white font-semibold rounded-tr-none shadow-md shadow-agri-600/10"
-                    : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-medium rounded-tl-none shadow-sm"
+                    ? "bg-agri-600 text-white font-semibold rounded-tr-none shadow-md shadow-agri-600/10 text-xs md:text-sm"
+                    : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 font-medium rounded-tl-none shadow-sm"
                 }`}>
-                  {m.text}
+                  {m.sender === "user" ? m.text : renderFormattedMessage(m.text)}
                 </div>
+
 
                 {/* Suggested Follow-up Action Chips */}
                 {m.recommendedActions && m.recommendedActions.length > 0 && (
