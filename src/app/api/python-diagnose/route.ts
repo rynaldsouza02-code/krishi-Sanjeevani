@@ -6,7 +6,15 @@ import os from "os";
 
 export const dynamic = "force-dynamic";
 
+export async function GET() {
+  return NextResponse.json({
+    status: "Python Gemini Leaf Disease Inspection Engine is active",
+    endpoint: "/api/python-diagnose"
+  });
+}
+
 export async function POST(req: NextRequest) {
+
   try {
     const { imageBase64, sampleId, language, customApiKey } = await req.json();
 
