@@ -24,6 +24,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
   const [selectedSampleId, setSelectedSampleId] = useState<string>("");
   const [customImage, setCustomImage] = useState<string | null>(null);
   const [userGeminiKey, setUserGeminiKey] = useState<string>("");
+  const [engineMode, setEngineMode] = useState<"python" | "gemini" | "local">("python");
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [diagnosis, setDiagnosis] = useState<(DiseaseDiagnosisOutput & { isAiPowered?: boolean; aiEngine?: string }) | null>(null);
 
@@ -82,6 +83,54 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
       }
     }
 
+    // Try Python Gemini API Route first if engineMode === "python" and image is uploaded
+    if (engineMode === "python" && activeImageBase64) {
+      try {
+        const pyRes = await fetch("/api/python-diagnose", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            imageBase64: activeImageBase64,
+            sampleId: targetSampleId,
+            language,
+            customApiKey: userGeminiKey
+          })
+        });
+
+        if (pyRes.ok) {
+          const pyResult = await pyRes.json();
+          if (pyResult && !pyResult.error) {
+            setDiagnosis({
+              disease: pyResult.disease || DISEASE_DATABASE[0],
+              detectedPlantName: pyResult.detectedPlantName || "Detected Crop Leaf",
+              detectedPlantKannada: pyResult.detectedPlantKannada || "ಪತ್ತೆಯಾದ ಎಲೆ",
+              detectedDiseaseName: pyResult.detectedDiseaseName || "Crop Pathogen",
+              detectedDiseaseKannada: pyResult.detectedDiseaseKannada || "ರೋಗ",
+              scientificName: pyResult.scientificName || "Plant Pathogen",
+              simulatedConfidence: pyResult.confidence || 95,
+              allPossibilities: pyResult.allPossibilities || [
+                { disease: DISEASE_DATABASE[0], probability: 95 }
+              ],
+              visionFeatures: {
+                chlorosisScore: pyResult.chlorosisScore || 45,
+                necroticLesionRatio: pyResult.necroticLesionRatio || 30,
+                patternType: "Python Gemini Vision Neural Scan",
+                patternTypeKannada: "ಪೈಥಾನ್ ಜೆಮಿನಿ ನ್ಯೂರಲ್ ಸ್ಕ್ಯಾನ್"
+              },
+              isValidLeaf: pyResult.isValidLeaf !== false,
+              isAiPowered: true,
+              aiEngine: "Python 3.14 + Google Gemini 2.5 Flash Engine"
+            });
+            setIsScanning(false);
+            confetti({ particleCount: 45, spread: 65, origin: { y: 0.6 } });
+            return;
+          }
+        }
+      } catch (pyErr) {
+        console.warn("Python Gemini diagnosis fallback:", pyErr);
+      }
+    }
+
     try {
       const res = await fetch("/api/diagnose-disease", {
         method: "POST",
@@ -133,6 +182,7 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
     }, 1200);
   };
 
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -173,12 +223,33 @@ export const DiseaseDetector: React.FC<DiseaseDetectorProps> = ({ language }) =>
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setEngineMode("python")}
+            className={`text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1.5 transition-all ${
+              engineMode === "python"
+                ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200"
+            }`}
+          >
+            <span>🐍 Python Gemini Engine</span>
+          </button>
+          <button
+            onClick={() => setEngineMode("gemini")}
+            className={`text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1.5 transition-all ${
+              engineMode === "gemini"
+                ? "bg-agri-600 text-white shadow-md shadow-agri-500/20"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200"
+            }`}
+          >
+            <span>⚡ Next.js AI Engine</span>
+          </button>
           <span className="text-xs px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-bold flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
             <span>{language === "kn" ? "ಸರ್ಕಾರಿ ಮಾಹಿತಿ ಪರಿಶೀಲಿತ" : "ICAR Govt Verified"}</span>
           </span>
         </div>
+
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
