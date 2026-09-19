@@ -10,19 +10,8 @@ export async function GET() {
   });
 }
 
-import { NextRequest, NextResponse } from "next/server";
-
-export const dynamic = 'force-dynamic';
-
-export async function GET() {
-  return NextResponse.json({ 
-    status: "AgriBot Gemini LLM Engine is active", 
-    endpoint: "/api/agribot",
-    supportedLanguages: ["en", "kn"] 
-  });
-}
-
 export async function POST(req: NextRequest) {
+
   try {
     const { message, language, customApiKey } = await req.json();
 
